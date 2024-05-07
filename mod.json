@@ -1,9 +1,8 @@
 {
-    "displayName": "Mod Template",
-    "description": "Mindustry Java mod template, complete with EntityAnno and syntax downgrader integration.",
-    "version": "v1.0",
+    "displayName": "Human Resources Dept.",
+    "version": "v0",
     "minGameVersion": "146",
-    "author": "You",
+    "author": "@Goob_rr",
     "java": true,
-    "main": "template.ModTemplate"
+    "main": "hrd.HRDept"
 }
