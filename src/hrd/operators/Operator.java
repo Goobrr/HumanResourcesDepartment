@@ -5,7 +5,11 @@ import arc.*;
 public class Operator{
     public String name;
     public String displayName;
+    public String title = "Operator";
+    public int stars = 3;
     public boolean assigned = false;
+    protected boolean unlocked = false;
+    public boolean alwaysUnlocked = true;
     public int sectorid = -1;
     public int id;
 
@@ -25,6 +29,10 @@ public class Operator{
 
     public void update(){
 
+    }
+
+    public boolean isUnlocked(){
+        return alwaysUnlocked || unlocked;
     }
 
     protected void load(){

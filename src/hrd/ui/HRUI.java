@@ -16,7 +16,7 @@ public class HRUI{
     public static void load(){
         // Operators Button
         Events.on(ResizeEvent.class, e -> {
-            // Insert our button into the database submenu button with reflection magic
+            // Insert our button into the database submenu with reflection magic
             // By *replacing ALL of the menu buttons*
             // May break itself or other mods if another overrides it
             Table buttons = (Table) ((Table) Reflect.get(Vars.ui.menufrag, "container")).getChildren().get(0);
@@ -54,7 +54,7 @@ public class HRUI{
         if(!Vars.mods.hasContentErrors()){
             run.run();
         }else{
-            Vars.ui.showInfo("@mod.noerrorplay");
+            Vars.ui.showInfo(Core.bundle.get("noerrorplay"));
         }
     }
 }

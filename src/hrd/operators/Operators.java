@@ -12,6 +12,11 @@ public class Operators{
 
     public static void load(){
         minako = new Operator("minako"){
+            {
+                alwaysUnlocked = true;
+                title = "Assistant Manager";
+                stars = 5;
+            }
             @Override
             public void update(){
                 Groups.build.each(b -> b.team() == Vars.player.team(), b -> {
@@ -21,7 +26,13 @@ public class Operators{
                 });
             }
         };
-        rhyo = new Operator("rhyo");
+        rhyo = new Operator("rhyo"){
+            {
+                alwaysUnlocked = true;
+                title = "Security Manager";
+                stars = 5;
+            }
+        };
     }
 
     public static Operator getByID(int id){
