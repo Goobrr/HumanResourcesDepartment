@@ -71,8 +71,6 @@ public class OperatorCard extends Table {
 
         stack(portrait, overlay).size(300f, 420f);
 
-        Log.info(this);
-
         // Click and hover behavior, similar to buttons.
         touchable(() -> Touchable.enabled);
         setTransform(true);
@@ -125,30 +123,16 @@ public class OperatorCard extends Table {
 
         // Darken cards in the background
         Events.on(CardSelectEvent.class, c -> {
-            Log.info("Waagh");
-
             if(c.operator == null){
-                tweenColorRecursive(this, Color.white);
+                actions(Actions.alpha(1f, 0.5f, Interp.pow3Out));
                 return;
             }
 
             if(c.operator.id != operator.id){
-                tweenColorRecursive(this, Pal.lightishGray);
+                actions(Actions.alpha(0.5f, 0.5f, Interp.pow3Out));
             }
         });
 
-    }
-
-    // TODO Fix flickery darken effect
-    public void tweenColorRecursive(WidgetGroup group, Color color){
-        group.actions(Actions.color(color, 0.5f, Interp.pow3Out));
-        for(Element child : group.getChildren()){
-            if(child instanceof WidgetGroup t){
-                tweenColorRecursive(t, color);
-            }else{
-                child.setColor(color);
-            }
-        }
     }
 
     class CardSelectEvent{
