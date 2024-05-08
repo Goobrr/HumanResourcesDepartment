@@ -32,11 +32,11 @@ public class HRUI{
                 ),
                 new MenuButton(Core.bundle.get("database.button"), Icon.menu, () -> {},
                     new MenuButton(Core.bundle.get("schematics"), Icon.paste, () -> Vars.ui.schematics.show()),
-                    new MenuButton(Core.bundle.get("operators"), Icon.players, () -> operators.show()),
+                    new MenuButton(Core.bundle.get("hrd.operators"), Icon.players, () -> operators.show()),
                     new MenuButton(Core.bundle.get("database"), Icon.book, () -> Vars.ui.database.show()),
                     new MenuButton(Core.bundle.get("about.button"), Icon.info, () -> Vars.ui.about.show())
                 ),
-                new MenuButton("@editor", Icon.terrain, () -> checkPlay(Vars.ui.maps::show)),
+                new MenuButton(Core.bundle.get("editor"), Icon.terrain, () -> checkPlay(Vars.ui.maps::show)),
                 (Vars.steam ? new MenuButton(Core.bundle.get("workshop"), Icon.steam, Vars.platform::openWorkshop) : null),
                 new MenuButton(Core.bundle.get("mods"), Icon.book, Vars.ui.mods::show),
                 new MenuButton(Core.bundle.get("settings"), Icon.settings, Vars.ui.settings::show)

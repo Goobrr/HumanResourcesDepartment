@@ -14,7 +14,6 @@ public class Operators{
         minako = new Operator("minako"){
             {
                 alwaysUnlocked = true;
-                title = "Assistant Manager";
                 stars = 5;
             }
             @Override
@@ -29,7 +28,6 @@ public class Operators{
         rhyo = new Operator("rhyo"){
             {
                 alwaysUnlocked = true;
-                title = "Security Manager";
                 stars = 5;
             }
         };

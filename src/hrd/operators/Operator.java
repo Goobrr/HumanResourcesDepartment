@@ -4,12 +4,20 @@ import arc.*;
 
 public class Operator{
     public String name;
-    public String displayName;
+
+    /** Used as fallback if this operator lacks a title bundle entry **/
     public String title = "Operator";
+
+    /** Used as fallback if this operator lacks a name bundle entry **/
+    public String displayName;
+
     public int stars = 3;
+
     public boolean assigned = false;
     protected boolean unlocked = false;
     public boolean alwaysUnlocked = true;
+
+    /** Sector this operator is currently assigned to, -1 if none **/
     public int sectorid = -1;
     public int id;
 
@@ -17,7 +25,6 @@ public class Operator{
 
     public Operator(String name){
         this.name = name;
-        this.displayName = Core.bundle.get(this.name + ".displayname", "");
 
         load();
 

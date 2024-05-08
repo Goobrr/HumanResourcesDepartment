@@ -1,7 +1,9 @@
 package hrd.ui;
 
 import arc.Core;
+import arc.Events;
 import arc.func.Cons;
+import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
 import arc.scene.Element;
@@ -12,11 +14,15 @@ import arc.scene.event.InputListener;
 import arc.scene.event.Touchable;
 import arc.scene.style.Drawable;
 import arc.scene.style.TextureRegionDrawable;
+import arc.scene.ui.Label;
 import arc.scene.ui.layout.Cell;
+import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.WidgetGroup;
 import arc.util.Align;
 import arc.util.Log;
 import hrd.operators.Operator;
+import mindustry.game.EventType;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
@@ -39,9 +45,9 @@ public class OperatorCard extends Table {
 
                 n.table(m -> {
                     m.top().left();
-                    m.label(() -> operator.name).top().left();
+                    m.label(() -> Core.bundle.get("hrd.operator." + operator.name + ".name", operator.displayName == null ? operator.name : operator.displayName)).top().left();
                     m.row();
-                    m.label(() -> operator.title).color(Pal.gray).top().left();
+                    m.label(() -> (Core.bundle.get("hrd.operator." + operator.name + ".title", operator.title))).color(Pal.gray).top().left();
                 }).padLeft(5f).left().growX();
             }).top().left().growX();
 
@@ -65,6 +71,8 @@ public class OperatorCard extends Table {
 
         stack(portrait, overlay).size(300f, 420f);
 
+        Log.info(this);
+
         // Click and hover behavior, similar to buttons.
         touchable(() -> Touchable.enabled);
         setTransform(true);
@@ -83,6 +91,8 @@ public class OperatorCard extends Table {
 
                 background(Tex.buttonDown);
 
+                Events.fire(new CardSelectEvent(operator));
+
                 setZIndex(50);
                 actions(Actions.parallel(
                         Actions.scaleTo(1.05f, 1.05f, 0.3f, Interp.pow3Out),
@@ -98,6 +108,8 @@ public class OperatorCard extends Table {
 
                 background(Tex.button);
 
+                Events.fire(new CardSelectEvent(null));
+
                 setZIndex(51);
                 actions(Actions.parallel(
                         Actions.scaleTo(1.0f, 1.0f, 0.3f, Interp.pow3Out),
@@ -110,5 +122,40 @@ public class OperatorCard extends Table {
                 callback.get(operator);
             }
         });
+
+        // Darken cards in the background
+        Events.on(CardSelectEvent.class, c -> {
+            Log.info("Waagh");
+
+            if(c.operator == null){
+                tweenColorRecursive(this, Color.white);
+                return;
+            }
+
+            if(c.operator.id != operator.id){
+                tweenColorRecursive(this, Pal.lightishGray);
+            }
+        });
+
+    }
+
+    // TODO Fix flickery darken effect
+    public void tweenColorRecursive(WidgetGroup group, Color color){
+        group.actions(Actions.color(color, 0.5f, Interp.pow3Out));
+        for(Element child : group.getChildren()){
+            if(child instanceof WidgetGroup t){
+                tweenColorRecursive(t, color);
+            }else{
+                child.setColor(color);
+            }
+        }
+    }
+
+    class CardSelectEvent{
+        public Operator operator;
+
+        public CardSelectEvent(Operator operator){
+            this.operator = operator;
+        }
     }
 }
