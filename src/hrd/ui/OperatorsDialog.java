@@ -14,14 +14,13 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 public class OperatorsDialog extends BaseDialog{
     ScrollPane roster;
     Table rosterTopRow, rosterBottomRow;
-    Table operatorInfo, operatorRoster, operatorInfoTable, operatorNameTable, offshoot, operatorStats;
+    Table operatorInfo, operatorRoster, operatorInfoTable, operatorNameTable, offshoot, operatorStats, sidebarDefault;
     int operatorCount;
     Operator selectedOperator;
     public OperatorsDialog(){
@@ -44,7 +43,11 @@ public class OperatorsDialog extends BaseDialog{
             }).top().left().width(30f).padTop(30f);
 
             main.table(Styles.black5, main2 -> {
-                main2.table(Styles.grayPanel, d -> {
+                Table sideBackground = new Table(Styles.grayPanel, d -> {
+                    // soon
+                });
+
+                Table sideStats = new Table(d -> {
                     d.top().left();
 
                     operatorNameTable = d.table(Table::left).top().left().padTop(30f).height(140).get();
@@ -54,7 +57,16 @@ public class OperatorsDialog extends BaseDialog{
 
                     d.row();
                     d.table(w -> operatorStats = w).grow();
-                }).width(700f).growY().left().get().setZIndex(1);
+                    operatorStats.setTransform(true);
+                });
+
+                Table sideDefault = new Table(d -> {
+                    sidebarDefault = d;
+
+                    buildDefaultSidebar();
+                });
+
+                main2.stack(sideBackground, sideDefault, sideStats).width(700f).growY().left().get().setZIndex(1);
 
                 operatorRoster = new Table(c -> {
                     c.top().left();
@@ -125,6 +137,7 @@ public class OperatorsDialog extends BaseDialog{
                         )
                 ));
                 operatorStats.clearChildren();
+                buildDefaultSidebar();
                 nameTableShown = false;
             }
             return;
@@ -178,9 +191,17 @@ public class OperatorsDialog extends BaseDialog{
 
         // Operator Stats
         buildStats(operator);
+        sidebarDefault.clearChildren();
 
         lastOperator = operator;
 
+    }
+
+    public void buildDefaultSidebar(){
+        sidebarDefault.top().left();
+        sidebarDefault.margin(35f);
+
+        sidebarDefault.label(() -> Core.bundle.get("hrd.operators").toUpperCase()).style(HRStyles.title).height(80f).top().left().growX().get().setAlignment(Align.left);
     }
 
     public void buildStats(Operator operator){
