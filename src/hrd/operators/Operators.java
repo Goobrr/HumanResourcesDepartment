@@ -15,6 +15,7 @@ public class Operators{
             {
                 alwaysUnlocked = true;
                 stars = 5;
+                maxExperience = 750;
             }
             @Override
             public void update(){
@@ -29,8 +30,13 @@ public class Operators{
             {
                 alwaysUnlocked = true;
                 stars = 5;
+                maxExperience = 600;
             }
         };
+
+        for(Operator operator : all.values().toArray()){
+            operator.load();
+        }
     }
 
     public static Operator getByID(int id){

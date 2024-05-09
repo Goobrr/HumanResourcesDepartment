@@ -3,33 +3,25 @@ package hrd.ui;
 import arc.Core;
 import arc.Events;
 import arc.func.Cons;
-import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
 import arc.scene.Element;
 import arc.scene.actions.Actions;
 import arc.scene.event.ClickListener;
 import arc.scene.event.InputEvent;
-import arc.scene.event.InputListener;
 import arc.scene.event.Touchable;
-import arc.scene.style.Drawable;
 import arc.scene.style.TextureRegionDrawable;
-import arc.scene.ui.Label;
-import arc.scene.ui.layout.Cell;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.Table;
-import arc.scene.ui.layout.WidgetGroup;
 import arc.util.Align;
-import arc.util.Log;
 import hrd.operators.Operator;
-import mindustry.game.EventType;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
+import mindustry.ui.Styles;
 
 public class OperatorCard extends Table {
 
-    public OperatorCard(Operator operator, Cons<Operator> callback) {
+    public OperatorCard(Operator operator, Cons<Operator> pressCallback, Cons<Operator> hoverCallback) {
         top().left();
 
         background(Tex.button);
@@ -40,7 +32,7 @@ public class OperatorCard extends Table {
             t.margin(5f);
 
             // Name & Title
-            t.table(n -> {
+            t.table(Styles.black8, n -> {
                 n.image(Icon.modeSurvival).size(30f).left();
 
                 n.table(m -> {
@@ -49,6 +41,9 @@ public class OperatorCard extends Table {
                     m.row();
                     m.label(() -> (Core.bundle.get("hrd.operator." + operator.name + ".title", operator.title))).color(Pal.gray).top().left();
                 }).padLeft(5f).left().growX();
+
+                n.row();
+                n.table().height(10f); // padding hack
             }).top().left().growX();
 
             // Stars
@@ -61,6 +56,7 @@ public class OperatorCard extends Table {
                 }
             }).top().left().padTop(10f);
         });
+        overlay.touchable(() -> Touchable.disabled);
 
         // Character portrait
         Table portrait = new Table(t -> {
@@ -90,6 +86,7 @@ public class OperatorCard extends Table {
                 background(Tex.buttonDown);
 
                 Events.fire(new CardSelectEvent(operator));
+                hoverCallback.get(operator);
 
                 setZIndex(50);
                 actions(Actions.parallel(
@@ -117,7 +114,7 @@ public class OperatorCard extends Table {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                callback.get(operator);
+                pressCallback.get(operator);
             }
         });
 

@@ -6,6 +6,7 @@ import hrd.operators.*;
 import hrd.ui.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.mod.*;
 import hrd.gen.*;
 import mindustry.type.*;
@@ -14,12 +15,23 @@ public class HRDept extends Mod{
     @Nullable
     public static Operator activeOperator = null;
 
+    public HRDept(){
+        Events.on(FileTreeInitEvent.class, e -> {
+            HRStyles.load();
+            HRFonts.load();
+        });
+    }
+
     @Override
     public void loadContent(){
+        // testing
+        Core.settings.put("serpulo-15-operator", 0);
+        Core.settings.put("hrd-minako-experience", 200f);
+        Core.settings.put("hrd-minako-sector", 15);
+        Core.settings.put("hrd-minako-planet", "serpulo");
+
         EntityRegistry.register();
         Operators.load();
-
-        Core.settings.put("serpulo-15-operator", 0);
 
         Events.on(ClientLoadEvent.class, e -> {
             HRUI.load();

@@ -1,21 +1,27 @@
 package hrd.ui;
 
-import arc.*;
+import arc.Core;
+import arc.flabel.FLabel;
+import arc.graphics.*;
 import arc.math.Interp;
 import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.Log;
+import arc.util.*;
 import hrd.operators.*;
+import mindustry.*;
+import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 public class OperatorsDialog extends BaseDialog{
     ScrollPane roster;
     Table rosterTopRow, rosterBottomRow;
-    Table operatorInfo, operatorRoster, operatorInfoTable;
+    Table operatorInfo, operatorRoster, operatorInfoTable, operatorNameTable, offshoot, operatorStats;
     int operatorCount;
     Operator selectedOperator;
     public OperatorsDialog(){
@@ -25,38 +31,59 @@ public class OperatorsDialog extends BaseDialog{
 
         cont.setTransform(true);
         cont.margin(100f);
-        cont.table(Styles.black5, main -> {
-            main.table(Styles.grayPanel, d -> {
+        cont.table(main -> {
+            main.table(t -> {
+                // operator name table offshoot
+                t.top().left();
+                offshoot = t.table(Tex.whiteui).top().right().height(140f).growX().get();
+                offshoot.setTransform(true);
+                offshoot.actions(Actions.parallel(
+                        Actions.moveBy(30f, 0),
+                        Actions.scaleTo(0, 1)
+                ));
+            }).top().left().width(30f).padTop(30f);
 
-            }).width(700f).growY().left().get().setZIndex(1);
+            main.table(Styles.black5, main2 -> {
+                main2.table(Styles.grayPanel, d -> {
+                    d.top().left();
 
-            operatorRoster = new Table(c -> {
-                c.top().left();
-                roster = c.pane(Styles.horizontalPane, t -> {
-                    t.left();
+                    operatorNameTable = d.table(Table::left).top().left().padTop(30f).height(140).get();
+                    operatorNameTable.setTransform(true);
+                    operatorNameTable.background(Tex.whiteui);
+                    operatorNameTable.actions(Actions.scaleTo(0, 1));
 
-                    rosterTopRow = t.table(r -> r.top().left()).height(450f).growX().top().left().padBottom(10f).get();
-                    rosterTopRow.setClip(false);
-                    t.row();
-                    rosterBottomRow = t.table(r -> r.top().left()).height(450f).growX().top().left().get();
-                    rosterBottomRow.setClip(false);
-                    t.pack();
+                    d.row();
+                    d.table(w -> operatorStats = w).grow();
+                }).width(700f).growY().left().get().setZIndex(1);
 
-                }).growX().height(950f).get();
-                roster.setZIndex(0);
-                roster.setScrollingDisabled(false, true);
-                roster.setFadeScrollBars(true);
-            });
-            operatorRoster.setTransform(true);
+                operatorRoster = new Table(c -> {
+                    c.top().left();
+                    roster = c.pane(Styles.horizontalPane, t -> {
+                        t.left();
 
-            operatorInfo = new Table(c -> {
-                operatorInfoTable = c;
-            });
-            operatorInfo.touchable(() -> Touchable.disabled);
-            operatorInfo.setTransform(true);
-            operatorInfo.actions(Actions.alpha(0));
+                        rosterTopRow = t.table(r -> r.top().left()).height(450f).growX().top().left().padBottom(10f).get();
+                        rosterTopRow.setClip(false);
+                        t.row();
+                        rosterBottomRow = t.table(r -> r.top().left()).height(450f).growX().top().left().get();
+                        rosterBottomRow.setClip(false);
+                        t.pack();
 
-            main.stack(operatorInfo, operatorRoster).left().grow();
+                    }).growX().height(950f).get();
+                    roster.setZIndex(0);
+                    roster.setScrollingDisabled(false, true);
+                    roster.setFadeScrollBars(true);
+                });
+                operatorRoster.setTransform(true);
+
+                operatorInfo = new Table(c -> {
+                    operatorInfoTable = c;
+                });
+                operatorInfo.touchable(() -> Touchable.disabled);
+                operatorInfo.setTransform(true);
+                operatorInfo.actions(Actions.alpha(0));
+
+                main2.stack(operatorInfo, operatorRoster).left().grow();
+            }).grow();
         }).grow();
 
         for(Operator operator : Operators.all.values().toArray()){
@@ -71,10 +98,183 @@ public class OperatorsDialog extends BaseDialog{
     }
 
     public void buildOperatorInfo(Operator operator, float transitionDuration){
-        Table t = operatorInfoTable;
-        t.clearChildren();
-        t.label(() -> operator.name).top().left();
-        t.button("Back", () -> showOperator(null, 0.5f));
+        Table main = operatorInfoTable;
+        main.clearChildren();
+        main.top().left();
+        main.margin(15f);
+
+        main.button("Back", () -> {
+            showOperator(null, 0.5f);
+            showOperatorStats(null);
+        });
+    }
+
+    boolean nameTableShown = false;
+    Operator lastOperator;
+
+    public void showOperatorStats(Operator operator){
+        // Name Table
+        if(operator == null){
+            if(nameTableShown) {
+                operatorNameTable.actions(Actions.scaleTo(0, 1, 0.5f, Interp.pow3Out));
+                offshoot.actions(Actions.sequence(
+                        Actions.delay(0.5f),
+                        Actions.parallel(
+                                Actions.moveBy(30f, 0, 0.1f, Interp.pow3Out),
+                                Actions.scaleTo(0, 1, 0.1f, Interp.pow3Out)
+                        )
+                ));
+                operatorStats.clearChildren();
+                nameTableShown = false;
+            }
+            return;
+        };
+        operatorNameTable.clearChildren();
+
+        operatorNameTable.margin(15f, 30f, 15f, 30f);
+        operatorNameTable.center().left();
+
+        Table text = new Table(t -> {
+            FLabel label = t.add(new FLabel(Core.bundle.get("hrd.operator." + operator.name + ".name").toUpperCase())).color(Pal.darkerGray).top().left().height(50).padTop(30f).get();
+            label.setStyle(HRStyles.title);
+
+            if(lastOperator != null && lastOperator.id == operator.id){
+                label.skipToTheEnd();
+            }else{
+                label.pause();
+                if (!nameTableShown) {
+                    operatorNameTable.actions(Actions.delay(0.4f, Actions.run(label::restart)));
+                } else {
+                    label.restart();
+                }
+            }
+
+            t.row();
+            t.table(r -> {
+                r.label(() ->
+                        Core.bundle.get("hrd.operator." + operator.name + ".title").toUpperCase()
+                ).top().left().color(Pal.darkerGray).get().setStyle(HRStyles.pixel);;
+                r.label(() ->
+                        "// " + Core.bundle.get("hrd.operator." + operator.name + ".serial").toUpperCase()
+                ).top().left().padLeft(15f).color(Pal.lightishGray).get().setStyle(HRStyles.pixel);
+            }).top().left();
+        }).left();
+
+        operatorNameTable.add(text).padLeft(45f).left();
+
+        if(!nameTableShown) {
+            offshoot.actions(Actions.sequence(
+                    Actions.parallel(
+                            Actions.moveBy(-30f, 0, 0.1f, Interp.pow3Out),
+                            Actions.scaleTo(1, 1, 0.1f, Interp.pow3Out)
+                    )
+            ));
+            operatorNameTable.actions(Actions.sequence(
+                    Actions.delay(0.1f),
+                    Actions.scaleTo(1, 1, 0.5f, Interp.pow3Out)
+            ));
+            nameTableShown = true;
+        }
+
+        // Operator Stats
+        buildStats(operator);
+
+        lastOperator = operator;
+
+    }
+
+    public void buildStats(Operator operator){
+        operatorStats.clearChildren();
+        operatorStats.top().left();
+        operatorStats.margin(35f);
+        operatorStats.table(t -> {
+            t.table(Styles.black5, d -> {
+                Label l = d.label(() -> operator.level + "").grow().center().get();
+                l.setStyle(HRStyles.pixel);
+                l.setAlignment(Align.center);
+            }).size(50f);
+            t.table(Tex.whiteui, d -> {
+                Table bar = new Table(Tex.whiteui);
+                bar.setColor(Pal.accent);
+                bar.setTransform(true);
+                bar.actions(Actions.scaleTo(operator.getProgress(), 1));
+
+                Label label = new Label(() -> "  " + operator.getExperience() + "/" + operator.getMaxExperience());
+                label.setStyle(HRStyles.pixel);
+                label.setColor(Pal.gray);
+
+                d.stack(bar, label).grow().left();
+            }).size(450f, 50f).padLeft(15f).color(Color.black);
+        }).top().left().growX().padBottom(30f);
+        operatorStats.row();
+        operatorStats.table(t -> {
+            t.top().left();
+            t.table(Tex.whiteui).size(30f).left().padRight(15f);
+            t.label(() -> Core.bundle.get("hrd.profile")).left().get().setStyle(HRStyles.pixel);
+        }).top().left().growX().height(40f).padBottom(25f);
+        operatorStats.row();
+        operatorStats.pane(Styles.defaultPane, t -> {
+            Label label = t.label(() -> Core.bundle.get("hrd.operator." + operator.name + ".profile")).top().left().growX().expandY().get();
+            label.setAlignment(Align.topLeft);
+            label.setWrap(true);
+        }).top().left().growX().maxHeight(400f).padBottom(30f);
+        operatorStats.row();
+        operatorStats.table(t -> {
+            t.top().left();
+            t.table(Tex.whiteui).size(30f).left().padRight(15f);
+            t.label(() -> Core.bundle.get("hrd.status")).left().height(30f).get().setStyle(HRStyles.pixel);
+        }).top().left().growX().height(40f).padBottom(25f);
+        operatorStats.row();
+        operatorStats.table(t -> {
+            t.table(Tex.whiteui, d -> {
+                Label l = d.label(() -> {
+                    if(operator.assigned) return "STATIONED";
+                    return "IDLE";
+                }).grow().left().padLeft(15f).get();
+                l.setStyle(HRStyles.pixel);
+                l.setAlignment(Align.left);
+                l.setColor(operator.assigned ? Pal.darkerGray : Color.white);
+
+                if(operator.sectorid != -1){
+                    l = d.label(() -> {
+                        return operator.planet == null ? "" : operator.planet.sectors.get(operator.sectorid).name();
+                    }).grow().right().padRight(15f).get();
+                    l.setStyle(HRStyles.pixel);
+                    l.setAlignment(Align.right);
+                    l.setColor(operator.assigned ? Pal.darkerGray : Color.white);
+                }
+
+                d.setColor(Pal.techBlue);
+                if(operator.assigned) d.setColor(Pal.accent);
+            }).height(50f).growX();
+            t.row();
+            t.table(Styles.black, d -> {
+                d.margin(15f);
+                d.top().left();
+
+                Label label = d.label(() -> Core.bundle.format(operator.assigned ? "hrd.operator-assigned" : "hrd.operator-idle", Core.bundle.get("hrd.operator." + operator.name + ".name"), operator.sectorid, operator.planet == null ? "" : operator.planet.localizedName)).grow().get();
+                label.setAlignment(Align.topLeft);
+                label.setWrap(true);
+
+                d.table(f -> {
+                    f.button(operator.assigned ? Core.bundle.get("hrd.reassign") : Core.bundle.get("hrd.assign"), HRStyles.flat, () -> {
+                        Vars.ui.planet.showSelect(operator.sectorid == -1 ? SectorPresets.groundZero.sector : operator.planet.sectors.get(operator.sectorid), s -> {
+                            operator.assign(s);
+                            buildStats(operator);
+                        });
+                    }).color(Pal.gray).top().left().growX().height(50f);
+
+                    if(operator.assigned){
+                        f.row();
+                        f.button(Core.bundle.get("hrd.unassign"), HRStyles.flat, () -> {
+                            operator.assign(null);
+                            buildStats(operator);
+                        }).color(Pal.gray).top().left().growX().height(50f).padTop(15f);
+                    };
+                }).top().right().width(150);
+
+            }).expandY().growX().top().left();
+        }).top().left().growX().padBottom(30f);
     }
 
     public void showOperator(Operator operator, float duration){
@@ -138,7 +338,7 @@ public class OperatorsDialog extends BaseDialog{
 
     public void addOperator(Operator operator){
         Table row = operatorCount % 2 == 0 ? rosterTopRow : rosterBottomRow;
-        Table card = new OperatorCard(operator, o -> showOperator(o, 0.5f));
+        Table card = new OperatorCard(operator, o -> showOperator(o, 0.5f), o -> showOperatorStats(o));
         row.add(card).pad(10f);
 
         operatorCount++;

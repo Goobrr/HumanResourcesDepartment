@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.ui.fragments.MenuFragment.*;
 
 public class HRUI{
@@ -14,6 +15,9 @@ public class HRUI{
     public static OperatorsDialog operators = new OperatorsDialog();
 
     public static void load(){
+        HRStyles.flat.over = HRStyles.flat.down = HRStyles.flat.up = Tex.whiteui; // woe
+        HRStyles.flat.font = Fonts.def;
+
         // Operators Button
         Events.on(ResizeEvent.class, e -> {
             // Insert our button into the database submenu with reflection magic
