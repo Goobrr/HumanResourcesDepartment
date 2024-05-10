@@ -19,6 +19,7 @@ public class HRDept extends Mod{
         Events.on(FileTreeInitEvent.class, e -> {
             HRStyles.load();
             HRFonts.load();
+            HRSounds.load();
         });
     }
 

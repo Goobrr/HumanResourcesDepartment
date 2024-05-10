@@ -41,8 +41,11 @@ public class OperatorMessageOverlay{
 
         Events.on(HREvents.DialogMessage.class, e -> {
             addMessage(e.sender, e.portrait, e.text, e.callback, e.lifetime);
+            Sounds.message.play();
         });
     }
+
+    static boolean codecShown = false;
 
     public static void addMessage(Operator operator, TextureRegion portrait, String text, Runnable callback, float lifetime){
         messagePile.row();
@@ -69,7 +72,12 @@ public class OperatorMessageOverlay{
                 ));
             }).padLeft(15f).bottom().left().growX().minHeight(42 * 3 + 15).expandY();
         }).bottom().left().width(700f).expandY().padTop(15f).get();
-        codec.actions(Actions.fadeIn(0.5f, Interp.pow3Out));
+
+        if(!codecShown) {
+            codec.actions(Actions.fadeIn(0.5f, Interp.pow3Out));
+            HRSounds.codecOpen.play();
+            codecShown = true;
+        }
 
         message.name = Core.graphics.getFrameId() + "";
 
@@ -89,10 +97,12 @@ public class OperatorMessageOverlay{
                         Actions.moveBy(-50, 0, 0.5f, Interp.pow3Out)
                 ),
                 Actions.run(() -> {
+                    // if this message is last on the pile
                     if(lastMessage != null && lastMessage.name == message.name){
                         lastOperator = null;
                         lastMessage = null;
                         codec.actions(Actions.fadeOut(0.5f, Interp.pow3Out));
+                        codecShown = false;
                     }
                     message.remove();
                 })
