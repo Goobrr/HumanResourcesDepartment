@@ -4,6 +4,7 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import hrd.ui.menu.HRMenuRenderer;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -51,6 +52,8 @@ public class HRUI{
 
             buttons.pack();
         });
+
+        Reflect.set(Vars.ui.menufrag, "renderer", new HRMenuRenderer());
 
         // Dialog overlay
         OperatorMessageOverlay.build(Vars.ui.hudGroup);
