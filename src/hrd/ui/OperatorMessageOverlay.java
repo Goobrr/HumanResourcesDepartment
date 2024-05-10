@@ -11,6 +11,8 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import hrd.*;
 import hrd.operators.*;
+import mindustry.Vars;
+import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.ui.*;
 
@@ -20,34 +22,48 @@ public class OperatorMessageOverlay{
     public static Table messagePile, codec;
     public static void build(Group parent){
         parent.fill(t -> {
-            t.margin(35f);
-            t.bottom().left();
+            rebuild(t);
 
-            t.table(w -> {
-                w.bottom().left();
-                messagePile = w;
-            }).bottom().left().width(700f).padBottom(15f);
-            t.row();
-            t.table(Styles.black5, w -> {
-                codec = w;
-                w.margin(5f);
-                w.label(() -> lastOperator == null ? "" : " " + Core.bundle.format("hrd.connected", Core.bundle.get("hrd.operator." + lastOperator.name + ".name").toUpperCase())).left().grow();
-                w.image(Icon.chat).size(25f).right();
-
-                w.setTransform(true);
-                w.actions(Actions.fadeOut(0f));
-            }).bottom().left().width(700f).height(40f);
+            Events.on(EventType.ResetEvent.class, e -> {
+                rebuild(t);
+                codecShown = false;
+            });
         });
 
         Events.on(HREvents.DialogMessage.class, e -> {
+            Log.info(HRSounds.message);
+            HRSounds.message.play();
             addMessage(e.sender, e.portrait, e.text, e.callback, e.lifetime);
-            Sounds.message.play();
         });
+    }
+
+    public static void rebuild(Table t){
+        t.clearChildren();
+
+        t.margin(35f);
+        t.bottom().left();
+
+        t.table(w -> {
+            w.bottom().left();
+            messagePile = w;
+        }).bottom().left().width(700f).padBottom(15f);
+        t.row();
+        t.table(Styles.black5, w -> {
+            codec = w;
+            w.margin(5f);
+            w.label(() -> lastOperator == null ? "" : " " + Core.bundle.format("hrd.connected", Core.bundle.get("hrd.operator." + lastOperator.name + ".name").toUpperCase())).left().grow();
+            w.image(Icon.chat).size(25f).right();
+
+            w.setTransform(true);
+            w.actions(Actions.fadeOut(0f));
+        }).bottom().left().width(700f).height(40f);
     }
 
     static boolean codecShown = false;
 
     public static void addMessage(Operator operator, TextureRegion portrait, String text, Runnable callback, float lifetime){
+        if(!Vars.state.isPlaying()) return;
+
         messagePile.row();
 
         Table message = messagePile.table(t -> {
