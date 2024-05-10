@@ -3,6 +3,7 @@ package hrd.ui;
 import arc.Core;
 import arc.Events;
 import arc.flabel.FLabel;
+import arc.flabel.FListener;
 import arc.graphics.g2d.*;
 import arc.math.Interp;
 import arc.scene.*;
@@ -16,54 +17,54 @@ import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.ui.*;
 
+
+// TODO Sometimes it breaks UI noises as a whole, find out what the fuck's causing it and stop it
 public class OperatorMessageOverlay{
     public static Table lastMessage;
     public static Operator lastOperator;
     public static Table messagePile, codec;
     public static void build(Group parent){
         parent.fill(t -> {
-            rebuild(t);
+            t.clearChildren();
+
+            t.margin(35f);
+            t.bottom().left();
+
+            t.table(w -> {
+                w.bottom().left();
+                messagePile = w;
+            }).bottom().left().width(700f).padBottom(15f);
+            t.row();
+            t.table(Styles.black5, w -> {
+                codec = w;
+                w.margin(5f);
+                w.label(() -> lastOperator == null ? "" : " " + Core.bundle.format("hrd.connected", Core.bundle.get("hrd.operator." + lastOperator.name + ".name").toUpperCase())).left().grow();
+                w.image(Icon.chat).size(25f).right();
+
+                w.setTransform(true);
+                w.actions(Actions.fadeOut(0f));
+            }).bottom().left().width(700f).height(40f);
 
             Events.on(EventType.ResetEvent.class, e -> {
-                rebuild(t);
+                messagePile.clearChildren();
+                codec.actions(Actions.fadeOut(0f));
+                lastOperator = null;
+                lastMessage = null;
+
                 codecShown = false;
             });
         });
 
         Events.on(HREvents.DialogMessage.class, e -> {
-            Log.info(HRSounds.message);
-            HRSounds.message.play();
+            if(!Vars.state.isGame()) return;
+            Core.app.post(() -> HRSounds.message.play(1f));
             addMessage(e.sender, e.portrait, e.text, e.callback, e.lifetime);
         });
-    }
-
-    public static void rebuild(Table t){
-        t.clearChildren();
-
-        t.margin(35f);
-        t.bottom().left();
-
-        t.table(w -> {
-            w.bottom().left();
-            messagePile = w;
-        }).bottom().left().width(700f).padBottom(15f);
-        t.row();
-        t.table(Styles.black5, w -> {
-            codec = w;
-            w.margin(5f);
-            w.label(() -> lastOperator == null ? "" : " " + Core.bundle.format("hrd.connected", Core.bundle.get("hrd.operator." + lastOperator.name + ".name").toUpperCase())).left().grow();
-            w.image(Icon.chat).size(25f).right();
-
-            w.setTransform(true);
-            w.actions(Actions.fadeOut(0f));
-        }).bottom().left().width(700f).height(40f);
     }
 
     static boolean codecShown = false;
 
     public static void addMessage(Operator operator, TextureRegion portrait, String text, Runnable callback, float lifetime){
-        if(!Vars.state.isPlaying()) return;
-
         messagePile.row();
 
         Table message = messagePile.table(t -> {
@@ -80,6 +81,14 @@ public class OperatorMessageOverlay{
                 l.setWrap(true);
                 l.pause();
 
+                l.setTypingListener(new FListener(){
+                    @Override
+                    public void onChar(char ch) {
+                        FListener.super.onChar(ch);
+                        Core.app.post(() -> HRSounds.type.play());
+                    }
+                });
+
                 w.setTransform(true);
                 w.actions(Actions.sequence(
                         Actions.scaleTo(0, 1),
@@ -91,7 +100,7 @@ public class OperatorMessageOverlay{
 
         if(!codecShown) {
             codec.actions(Actions.fadeIn(0.5f, Interp.pow3Out));
-            HRSounds.codecOpen.play();
+            Core.app.post(() -> HRSounds.codecOpen.play());
             codecShown = true;
         }
 
