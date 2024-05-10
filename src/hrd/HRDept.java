@@ -39,6 +39,9 @@ public class HRDept extends Mod{
 
         Events.on(ResetEvent.class, e -> {
             Log.info("Reset Event Called");
+            if(activeOperator != null){
+                activeOperator.dialog.stop();
+            }
             activeOperator = null;
         });
 
@@ -51,14 +54,6 @@ public class HRDept extends Mod{
         Events.on(WorldLoadEvent.class, e -> {
             Log.info("World Load Called");
 
-            Timer.schedule(() -> {
-                Events.fire(new HREvents.DialogMessage(Operators.minako, Core.atlas.find("human-resources-department-minako-portrait-bust"), "Hey there!", 10f));
-            }, 3f);
-
-            Timer.schedule(() -> {
-                Events.fire(new HREvents.DialogMessage(Operators.minako, Core.atlas.find("human-resources-department-minako-portrait-bust"), "This is a dialog test for the HRD mod!",10f));
-            }, 5f);
-
             Sector sec = Vars.state.getSector();
             if(sec != null){
                 Log.info("Entered Sector");
@@ -67,6 +62,7 @@ public class HRDept extends Mod{
                 int id = Core.settings.getInt(sec.planet.name + "-" + sec.id + "-operator", -1);
                 if(id != -1){
                     activeOperator = Operators.getByID(id);
+                    activeOperator.dialog.start();
                     Log.info("Loaded Operator " + activeOperator.name);
                 }else{
                     Log.info("No Active Operator for Sector");

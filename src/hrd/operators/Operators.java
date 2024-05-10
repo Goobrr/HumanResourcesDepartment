@@ -2,6 +2,7 @@ package hrd.operators;
 
 import arc.struct.*;
 import arc.util.*;
+import hrd.operators.dialog.dialogs.*;
 import mindustry.*;
 import mindustry.gen.*;
 
@@ -16,6 +17,8 @@ public class Operators{
                 alwaysUnlocked = true;
                 stars = 5;
                 maxExperience = 750;
+
+                dialog = new MinakoDialogProvider();
             }
             @Override
             public void update(){
