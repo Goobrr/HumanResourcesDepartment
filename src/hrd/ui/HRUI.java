@@ -52,7 +52,8 @@ public class HRUI{
             buttons.pack();
         });
 
-
+        // Dialog overlay
+        OperatorMessageOverlay.build(Vars.ui.hudGroup);
     }
     private static void checkPlay(Runnable run){
         if(!Vars.mods.hasContentErrors()){
