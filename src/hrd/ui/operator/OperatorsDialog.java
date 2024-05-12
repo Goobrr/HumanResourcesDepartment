@@ -1,4 +1,4 @@
-package hrd.ui;
+package hrd.ui.operator;
 
 import arc.Core;
 import arc.flabel.FLabel;
@@ -10,6 +10,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import hrd.operators.*;
+import hrd.ui.HRStyles;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;

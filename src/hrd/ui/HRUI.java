@@ -4,7 +4,8 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import hrd.ui.menu.HRMenuRenderer;
+import hrd.ui.menu.*;
+import hrd.ui.operator.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -30,7 +31,13 @@ public class HRUI{
 
             Reflect.invoke(Vars.ui.menufrag, "buttons", new Object[]{buttons, new MenuButton[]{
                 new MenuButton(Core.bundle.get("play"), Icon.play, () -> {},
-                    new MenuButton(Core.bundle.get("campaign"), Icon.play, () -> checkPlay(Vars.ui.planet::show)),
+                    new MenuButton(Core.bundle.get("campaign"), Icon.play, () -> checkPlay(() -> {
+                        if(true){
+                            Vars.ui.planet.show();
+                        }else{
+                            Vars.ui.planet.show();
+                        }
+                    })),
                     new MenuButton(Core.bundle.get("joingame"), Icon.add, () -> checkPlay(Vars.ui.join::show)),
                     new MenuButton(Core.bundle.get("customgame"), Icon.terrain, () -> checkPlay(Vars.ui.custom::show)),
                     new MenuButton(Core.bundle.get("loadgame"), Icon.download, () -> checkPlay(Vars.ui.load::show))
