@@ -6,8 +6,7 @@ import arc.struct.Seq;
 import arc.util.Log;
 import hrd.operators.dialog.*;
 import hrd.operators.dialog.dialogs.*;
-import hrd.operators.meta.OperatorAbility;
-import hrd.operators.meta.OperatorClass;
+import hrd.operators.meta.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
@@ -25,6 +24,8 @@ public class Operator{
 
     // Meta
     public OperatorClass operatorClass = OperatorClass.operator;
+
+    public Faction faction = Faction.seventhBranch;
 
     public Seq<OperatorAbility> abilities = new Seq<>();
 

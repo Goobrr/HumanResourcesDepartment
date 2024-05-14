@@ -125,7 +125,23 @@ public class OperatorsDialog extends BaseDialog{
 
         // Middle
         main.table(m -> {
-            // Overlay
+            m.setClip(true);
+
+            // Faction Logo
+            m.fill(t -> {
+                t.margin(30f);
+                t.bottom().right();
+
+                t.image(Core.atlas.find("human-resources-department-" + operator.faction.name)).color(Pal.darkestGray).size(500f).bottom().right();
+            });
+
+            // Archetype
+            m.fill();
+
+            // Portrait
+            m.fill();
+
+            // Tabs
             m.fill(t -> {
                 t.margin(30f);
                 t.top().right();

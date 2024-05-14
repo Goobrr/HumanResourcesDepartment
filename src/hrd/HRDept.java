@@ -3,6 +3,7 @@ package hrd;
 import arc.*;
 import arc.util.*;
 import hrd.operators.*;
+import hrd.operators.meta.*;
 import hrd.ui.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -28,6 +29,8 @@ public class HRDept extends Mod{
         Core.settings.put("hrd-minako-experience", 200f);
 
         EntityRegistry.register();
+        OperatorClass.load();
+        Faction.load();
         Operators.load();
 
         Operators.minako.assign(SectorPresets.groundZero.sector);
