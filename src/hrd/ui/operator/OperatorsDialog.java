@@ -1,16 +1,17 @@
 package hrd.ui.operator;
 
-import arc.Core;
+import arc.*;
 import arc.flabel.FLabel;
 import arc.graphics.*;
 import arc.math.Interp;
 import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import hrd.operators.*;
-import hrd.operators.meta.OperatorAbility;
+import hrd.operators.meta.*;
 import hrd.ui.HRStyles;
 import mindustry.*;
 import mindustry.content.*;
@@ -27,7 +28,6 @@ public class OperatorsDialog extends BaseDialog{
     Operator selectedOperator;
     public OperatorsDialog(){
         super("Operators");
-        addCloseButton();
         titleTable.clear();
 
         cont.setTransform(true);
@@ -86,6 +86,14 @@ public class OperatorsDialog extends BaseDialog{
                     roster.setZIndex(0);
                     roster.setScrollingDisabled(false, true);
                     roster.setFadeScrollBars(true);
+
+                    c.row();
+                    c.table( t -> {
+                        t.bottom().left();
+                        t.margin(30f);
+
+                        t.button(Icon.left, HRStyles.flati, this::hide).size(50f).bottom().left();
+                    }).bottom().left().grow();
                 });
                 operatorRoster.setTransform(true);
 
@@ -101,9 +109,7 @@ public class OperatorsDialog extends BaseDialog{
             }).grow();
         }).grow();
 
-        for(Operator operator : Operators.all.values().toArray()){
-            addOperator(operator);
-        }
+        addAllOperators(null);
 
         // Dummies for testing
 
@@ -117,33 +123,47 @@ public class OperatorsDialog extends BaseDialog{
         main.clearChildren();
         main.top().left();
 
-        main.button("Back", () -> {
-            showOperator(null, 0.5f);
-            showOperatorStats(null);
-        });
+        // Middle
+        main.table(m -> {
+            // Overlay
+            m.fill(t -> {
+                t.margin(30f);
+                t.top().right();
+                t.table(w -> {
+                    w.top().right();
 
-        main.table(t -> {
-            t.table(w -> {
-                w.setTransform(true);
-                w.image(Core.atlas.find("human-resources-department-manager-portrait-full")).size(1280f / 2, 1700f / 2).get();
+                    w.add(iconButton("Abilities", Core.bundle.get("hrd.abilities"), Icon.modeSurvival)).growX().height(50).top().right().padBottom(10f);
+                    w.row();
+                    w.add(iconButton("Journal", Core.bundle.get("hrd.journal"), Icon.book)).growX().height(50).top().right().padBottom(10f);
+                    w.row();
+                    w.add(iconButton("Items", Core.bundle.get("hrd.items"), Icon.settings)).growX().height(50).top().right().padBottom(10f);
+                    w.row();
+                    w.add(iconButton("Skins", Core.bundle.get("hrd.skins"), Icon.effect)).growX().height(50).top().right().padBottom(10f);
 
-                w.actions(Actions.parallel(
-                        Actions.repeat(-1, Actions.sequence(
-                            Actions.scaleTo(0, 1, 2f, Interp.sineIn),
-                            Actions.scaleTo(-1, 1, 2f, Interp.sineOut),
-                            Actions.scaleTo(0, 1, 2f, Interp.sineIn),
-                            Actions.scaleTo(1, 1, 2f, Interp.sineOut)
-                        )),
-                        Actions.repeat(-1, Actions.sequence(
-                                Actions.moveBy(1280 / 2f, 0f, 4f, Interp.sine),
-                                Actions.moveBy(-1280 / 2f, 0f, 4f, Interp.sine)
-                        ))
-                ));
-            }).expand();
+                }).top().right();
+            });
+
+            // Back button
+            m.fill(t -> {
+                t.margin(30f);
+                t.bottom().left();
+                t.table(w -> {
+                    w.bottom().left();
+
+                    w.button(Icon.left, HRStyles.flati, () -> {
+                        showOperator(null, 0.5f);
+                        showOperatorStats(null);
+                    }).size(50f);
+
+                }).bottom().left();
+            });
         }).grow();
 
+        // Righthand side
         main.table(Styles.grayPanel, m -> {
+            // Abilities
             m.fill(t -> {
+                t.name = "Abilities";
                 t.pane(p -> {
                     p.top().left();
                     p.margin(30f);
@@ -156,20 +176,93 @@ public class OperatorsDialog extends BaseDialog{
                                 c.table(w -> {
                                     w.image(Icon.lock).size(30f);
                                     w.row();
-                                    w.label(() -> Core.bundle.get("hrd.locked")).style(HRStyles.pixel).expand().get().setColor(Pal.darkerGray);
+                                    w.label(() -> Core.bundle.get("hrd.ability.locked")).style(HRStyles.pixel).expand().get().setColor(Pal.darkerGray);
                                 }).center();
                             }).growX().height(250f).padBottom(15f).tooltip(Core.bundle.get("hrd.ability." + ability.name + ".condition"));
                             p.row();
                         }
                     }
                 }).top().left().grow();;
+
+                t.setTransform(true);
+                Events.on(InfoTabSelect.class, e -> {
+                    t.touchable(() -> e.name == t.name ? Touchable.childrenOnly : Touchable.disabled);
+                    t.actions(Actions.alpha(e.name == t.name ? 1 : 0, 0.5f, Interp.pow3Out));
+                });
             });
 
+            // Journal Entries
             m.fill(t -> {
+                t.name = "Journal";
 
+
+
+                t.setTransform(true);
+                Events.on(InfoTabSelect.class, e -> {
+                    t.touchable(() -> e.name == t.name ? Touchable.childrenOnly : Touchable.disabled);
+                    t.actions(Actions.alpha(e.name == t.name ? 1 : 0, 0.5f, Interp.pow3Out));
+                });
+            });
+
+            // Equipped Items
+            m.fill(t -> {
+                t.name = "Items";
+
+
+
+                t.setTransform(true);
+                Events.on(InfoTabSelect.class, e -> {
+                    t.touchable(() -> e.name == t.name ? Touchable.childrenOnly : Touchable.disabled);
+                    t.actions(Actions.alpha(e.name == t.name ? 1 : 0, 0.5f, Interp.pow3Out));
+                });
+            });
+
+            // Skins(?)
+            m.fill(t -> {
+                t.name = "Skins";
+
+
+
+                t.setTransform(true);
+                Events.on(InfoTabSelect.class, e -> {
+                    t.touchable(() -> e.name == t.name ? Touchable.childrenOnly : Touchable.disabled);
+                    t.actions(Actions.alpha(e.name == t.name ? 1 : 0, 0.5f, Interp.pow3Out));
+                });
             });
         }).top().right().growY().width(700f);
+
+        Events.fire(new InfoTabSelect("Abilities"));
     }
+
+    public Table iconButton(String name, String text, TextureRegionDrawable icon){
+        return new Table(t -> {
+            t.setTransform(true);
+            t.top().right();
+
+            Label l = t.label(() -> text).right().growX().get();
+            l.setAlignment(Align.right);
+            l.actions(Actions.alpha(0));
+
+            ImageButton b = t.button(icon, Styles.emptyTogglei, () -> {
+                Events.fire(new InfoTabSelect(name));
+            }).size(40f).left().padLeft(15f).get();
+
+            b.hovered(() -> {
+                if(b.isChecked()) return;
+                l.actions(Actions.alpha(1, 0.2f, Interp.pow3Out));
+            });
+
+            b.exited(() -> {
+                if(b.isChecked()) return;
+                l.actions(Actions.alpha(0, 0.2f, Interp.pow3Out));
+            });
+
+            Events.on(InfoTabSelect.class, e -> {
+                b.setChecked(e.name == name);
+                l.actions(Actions.alpha(e.name == name ? 1 : 0, 0.2f, Interp.pow3Out));
+            });
+        });
+    };
 
     boolean nameTableShown = false;
     Operator lastOperator;
@@ -407,11 +500,30 @@ public class OperatorsDialog extends BaseDialog{
         }
     }
 
+    public void addAllOperators(OperatorClass filterBy){
+        rosterTopRow.clearChildren();
+        rosterBottomRow.clearChildren();
+
+        for(Operator operator : Operators.all.values().toArray()){
+            if(
+                (filterBy != null && operator.operatorClass != filterBy)
+                || !operator.isUnlocked()
+            ) return;
+            addOperator(operator);
+        }
+    }
     public void addOperator(Operator operator){
         Table row = operatorCount % 2 == 0 ? rosterTopRow : rosterBottomRow;
         Table card = new OperatorCard(operator, o -> showOperator(o, 0.5f), o -> showOperatorStats(o));
         row.add(card).pad(10f);
 
         operatorCount++;
+    }
+
+    static class InfoTabSelect {
+        public String name;
+        public InfoTabSelect(String name){
+            this.name = name;
+        }
     }
 }

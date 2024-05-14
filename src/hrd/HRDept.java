@@ -17,7 +17,6 @@ public class HRDept extends Mod{
 
     public HRDept(){
         Events.on(FileTreeInitEvent.class, e -> {
-            HRStyles.load();
             HRFonts.load();
             HRSounds.load();
         });
@@ -34,6 +33,7 @@ public class HRDept extends Mod{
         Operators.minako.assign(SectorPresets.groundZero.sector);
 
         Events.on(ClientLoadEvent.class, e -> {
+            HRStyles.load();
             HRUI.load();
         });
 

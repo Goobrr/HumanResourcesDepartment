@@ -73,7 +73,7 @@ public class Operator{
         this.experience += xp;
         if(this.experience >= maxExperience){
             this.experience = this.experience - maxExperience;
-            maxExperience = Mathf.ceil(maxExperience * 1.5f);
+            maxExperience = Mathf.ceil(maxExperience * maxExperienceScaling);
         }
     }
 
@@ -90,7 +90,7 @@ public class Operator{
     }
 
     public boolean isUnlocked(){
-        return alwaysUnlocked || unlocked;
+        return Core.settings.getBool("hrd-" + name + "-unlocked", alwaysUnlocked);
     }
 
     public boolean assign(Sector sector){
@@ -133,7 +133,6 @@ public class Operator{
             assigned = true;
         }
 
-        this.unlocked = Core.settings.getBool("hrd-" + name + "-unlocked", alwaysUnlocked);
         this.experience = Core.settings.getFloat("hrd-" + name + "-experience", 0);
         this.level = Core.settings.getInt("hrd-" + name + "-level", 1);
 

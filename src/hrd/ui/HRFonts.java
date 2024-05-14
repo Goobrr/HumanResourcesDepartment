@@ -43,10 +43,10 @@ public class HRFonts {
 
         Core.assets.load("title-hrd", Font.class, new FreeTypeFontLoaderParameter("fonts/title.ttf", new FreeTypeFontParameter(){{
             size = 85;
-        }})).loaded = f -> HRStyles.title.font = title = f;
+        }})).loaded = f -> title = f;
 
         Core.assets.load("pixel-hrd", Font.class, new FreeTypeFontLoaderParameter("fonts/pixel.ttf", new FreeTypeFontParameter(){{
             size = 30;
-        }})).loaded = f -> HRStyles.flat.font = HRStyles.pixel.font = pixel = f;
+        }})).loaded = f -> pixel = f;
     }
 }
