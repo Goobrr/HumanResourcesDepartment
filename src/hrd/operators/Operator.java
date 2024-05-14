@@ -2,9 +2,12 @@ package hrd.operators;
 
 import arc.*;
 import arc.math.Mathf;
+import arc.struct.Seq;
 import arc.util.Log;
 import hrd.operators.dialog.*;
 import hrd.operators.dialog.dialogs.*;
+import hrd.operators.meta.OperatorAbility;
+import hrd.operators.meta.OperatorClass;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
@@ -20,8 +23,12 @@ public class Operator{
 
     public int stars = 3;
 
+    // Meta
     public OperatorClass operatorClass = OperatorClass.operator;
 
+    public Seq<OperatorAbility> abilities = new Seq<>();
+
+    // Internal
     public boolean assigned = false;
     protected boolean unlocked = false;
     public boolean alwaysUnlocked = false;
@@ -52,6 +59,10 @@ public class Operator{
 
         id = nextid;
         nextid++;
+    }
+
+    public void abilities(OperatorAbility... abilities){
+        this.abilities.set(abilities);
     }
 
     public void update(){

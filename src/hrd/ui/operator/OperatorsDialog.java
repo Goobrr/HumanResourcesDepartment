@@ -10,6 +10,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import hrd.operators.*;
+import hrd.operators.meta.OperatorAbility;
 import hrd.ui.HRStyles;
 import mindustry.*;
 import mindustry.content.*;
@@ -95,6 +96,7 @@ public class OperatorsDialog extends BaseDialog{
                 operatorInfo.setTransform(true);
                 operatorInfo.actions(Actions.alpha(0));
 
+                // TODO replace with fill()s
                 main2.stack(operatorInfo, operatorRoster).left().grow();
             }).grow();
         }).grow();
@@ -114,12 +116,59 @@ public class OperatorsDialog extends BaseDialog{
         Table main = operatorInfoTable;
         main.clearChildren();
         main.top().left();
-        main.margin(15f);
 
         main.button("Back", () -> {
             showOperator(null, 0.5f);
             showOperatorStats(null);
         });
+
+        main.table(t -> {
+            t.table(w -> {
+                w.setTransform(true);
+                w.image(Core.atlas.find("human-resources-department-manager-portrait-full")).size(1280f / 2, 1700f / 2).get();
+
+                w.actions(Actions.parallel(
+                        Actions.repeat(-1, Actions.sequence(
+                            Actions.scaleTo(0, 1, 2f, Interp.sineIn),
+                            Actions.scaleTo(-1, 1, 2f, Interp.sineOut),
+                            Actions.scaleTo(0, 1, 2f, Interp.sineIn),
+                            Actions.scaleTo(1, 1, 2f, Interp.sineOut)
+                        )),
+                        Actions.repeat(-1, Actions.sequence(
+                                Actions.moveBy(1280 / 2f, 0f, 4f, Interp.sine),
+                                Actions.moveBy(-1280 / 2f, 0f, 4f, Interp.sine)
+                        ))
+                ));
+            }).expand();
+        }).grow();
+
+        main.table(Styles.grayPanel, m -> {
+            m.fill(t -> {
+                t.pane(p -> {
+                    p.top().left();
+                    p.margin(30f);
+                    for(OperatorAbility ability : operator.abilities){
+                        if(ability.unlockCondition.get(operator)) {
+                            p.table(ability::build).growX().height(250f).padBottom(15f);
+                            p.row();
+                        }else{
+                            p.table(Styles.black5, c -> {
+                                c.table(w -> {
+                                    w.image(Icon.lock).size(30f);
+                                    w.row();
+                                    w.label(() -> Core.bundle.get("hrd.locked")).style(HRStyles.pixel).expand().get().setColor(Pal.darkerGray);
+                                }).center();
+                            }).growX().height(250f).padBottom(15f).tooltip(Core.bundle.get("hrd.ability." + ability.name + ".condition"));
+                            p.row();
+                        }
+                    }
+                }).top().left().grow();;
+            });
+
+            m.fill(t -> {
+
+            });
+        }).top().right().growY().width(700f);
     }
 
     boolean nameTableShown = false;

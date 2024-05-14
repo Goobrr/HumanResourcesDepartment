@@ -3,6 +3,7 @@ package hrd.operators;
 import arc.struct.*;
 import arc.util.*;
 import hrd.operators.dialog.dialogs.*;
+import hrd.operators.meta.OperatorAbility;
 import mindustry.*;
 import mindustry.gen.*;
 
@@ -19,6 +20,12 @@ public class Operators{
                 maxExperience = 750;
 
                 dialog = new MinakoDialogProvider();
+
+                abilities(
+                        new OperatorAbility("micromanage", () -> Icon.defense.getRegion(), o -> true),
+                        new OperatorAbility("rush-hour", () -> Icon.defense.getRegion(), o -> false),
+                        new OperatorAbility("hands-on", () -> Icon.defense.getRegion(), o -> false)
+                );
             }
             @Override
             public void update(){

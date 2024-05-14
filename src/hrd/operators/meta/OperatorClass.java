@@ -1,8 +1,9 @@
-package hrd.operators;
+package hrd.operators.meta;
 
 import arc.Core;
 import arc.graphics.g2d.TextureRegion;
 
+// operator archetype classification, used for filtering, otherwise purely visual.
 public class OperatorClass {
     public String name;
     public TextureRegion region, regionSmall;
