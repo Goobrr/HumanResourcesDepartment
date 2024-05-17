@@ -1,4 +1,4 @@
-package hrd.ui.operator;
+package hrd.ui.elements;
 
 import arc.Core;
 import arc.Events;

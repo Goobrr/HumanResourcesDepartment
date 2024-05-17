@@ -13,6 +13,7 @@ import arc.util.*;
 import hrd.operators.*;
 import hrd.operators.meta.*;
 import hrd.ui.HRStyles;
+import hrd.ui.elements.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -26,6 +27,8 @@ public class OperatorsDialog extends BaseDialog{
     Table operatorInfo, operatorRoster, operatorInfoTable, operatorNameTable, offshoot, operatorStats, sidebarDefault;
     int operatorCount;
     Operator selectedOperator;
+
+    OperatorClass currentFilter;
     public OperatorsDialog(){
         super("Operators");
         titleTable.clear();
@@ -93,6 +96,54 @@ public class OperatorsDialog extends BaseDialog{
                         t.margin(30f);
 
                         t.button(Icon.left, HRStyles.flati, this::hide).size(50f).bottom().left();
+
+                        // filter
+                        t.table(w -> {
+                            w.touchable(() -> Touchable.enabled);
+                            w.left();
+                            w.setBackground(Tex.whiteui);
+                            w.setColor(Pal.darkerGray);
+
+                            w.table(Tex.whiteui, e -> {
+                                e.setColor(Pal.darkishGray);
+                                e.image(Icon.filter);
+                            }).size(50f).padRight(10f).touchable(Touchable.disabled).left();
+
+                            w.label(() -> Core.bundle.get("hrd.operator-class." + (currentFilter == null ? "all" : currentFilter.name)).toUpperCase()).style(HRStyles.pixel).touchable(Touchable.disabled).grow().get().setAlignment(Align.center);
+
+                            w.hovered(() -> w.setColor(Pal.darkishGray));
+                            w.exited(() -> w.setColor(Pal.darkerGray));
+                            w.clicked(() -> {
+                                int nextIndex = OperatorClass.all().indexOf(o -> {
+                                    return o.id == (currentFilter == null ? OperatorClass.operator.id : currentFilter.id);
+                                }) + 1;
+
+                                currentFilter = (nextIndex == OperatorClass.all().size ? null : OperatorClass.all().get(nextIndex));
+                                addAllOperators(currentFilter);
+                            });
+                        }).size(300f, 50f).bottom().left().padLeft(15f);
+
+                        t.table().growX(); // spacer.
+
+                        // recruitment button
+                        t.table(w -> {
+                            w.touchable(() -> Touchable.enabled);
+                            w.center();
+                            w.setBackground(Tex.whiteui);
+                            w.setColor(Pal.accent);
+
+                            w.margin(10f);
+                            w.image(Icon.bookOpen).size(30f).padRight(10f).touchable(Touchable.disabled).color(Pal.darkerGray);
+                            w.label(() -> Core.bundle.get("hrd.recruit")).style(HRStyles.pixel).touchable(Touchable.disabled).color(Pal.darkerGray).get().setAlignment(Align.left);
+
+                            w.hovered(() -> w.setColor(Color.white));
+                            w.exited(() -> w.setColor(Pal.accent));
+                            w.clicked(() -> {
+                                // show Gacha UI
+                                hide();
+                            });
+                        }).size(300f, 50f).bottom().right();
+
                     }).bottom().left().grow();
                 });
                 operatorRoster.setTransform(true);
@@ -110,12 +161,6 @@ public class OperatorsDialog extends BaseDialog{
         }).grow();
 
         addAllOperators(null);
-
-        // Dummies for testing
-
-        addOperator(new Operator("Theodore"));
-        addOperator(new Operator("Wyoming"));
-        addOperator(new Operator("Downwind"));
     }
 
     public void buildOperatorInfo(Operator operator, float transitionDuration){
