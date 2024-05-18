@@ -4,6 +4,7 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import hrd.ui.cutscene.*;
 import hrd.ui.menu.*;
 import hrd.ui.operator.*;
 import mindustry.*;
@@ -15,6 +16,7 @@ import mindustry.ui.fragments.MenuFragment.*;
 public class HRUI{
 
     public static OperatorsDialog operators = new OperatorsDialog();
+    public static CutsceneDialog cutsceneDialog = new CutsceneDialog();
 
     public static void load(){
         HRStyles.flat.over = HRStyles.flat.down = HRStyles.flat.up = Tex.whiteui; // woe
@@ -33,7 +35,7 @@ public class HRUI{
                 new MenuButton(Core.bundle.get("play"), Icon.play, () -> {},
                     new MenuButton(Core.bundle.get("campaign"), Icon.play, () -> checkPlay(() -> {
                         if(true){
-                            Vars.ui.planet.show();
+                            cutsceneDialog.show();
                         }else{
                             Vars.ui.planet.show();
                         }
