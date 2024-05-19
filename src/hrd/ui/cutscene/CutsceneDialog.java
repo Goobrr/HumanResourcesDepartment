@@ -1,23 +1,39 @@
 package hrd.ui.cutscene;
 
 import arc.*;
+import arc.flabel.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.actions.*;
+import arc.scene.event.*;
 import arc.scene.style.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Timer.*;
 import hrd.operators.*;
+import hrd.ui.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 public class CutsceneDialog extends BaseDialog{
     public ObjectMap<String, CutsceneActor> actors = new ObjectMap<>();
-    public Table cutsceneStage, background, stage, overlay;
+    public Table cutsceneStage, background, stage, overlay, skip;
+    public Label nameLabel;
+    public FLabel textLabel;
+
+    public CutsceneSequence sequence;
+
+    public boolean skippable = true;
+    public boolean auto = true;
+    public float autoWaitTime = 2f;
+    public Task autoTask;
 
     public float cameraX = 0;
     public CutsceneDialog(){
@@ -56,11 +72,122 @@ public class CutsceneDialog extends BaseDialog{
             overlay = t;
             t.name = "Overlay";
             t.bottom().left();
-            t.table(Tex.button, w -> {
+            t.table(Styles.black, w -> {
+                w.margin(20f);
+                w.top().left();
 
+                // Dialogue text
+                w.table(c -> {
+                    c.top().left();
+                    c.margin(20f, 300f, 20f, 300f);
+                    c.name = "Text";
+
+                    c.table(d -> {
+                        d.top().right();
+                        d.name = "Name";
+                        nameLabel = d.label(() -> "Name").top().right().grow().get();
+                        nameLabel.setColor(Pal.darkishGray);
+                        nameLabel.setAlignment(Align.topRight);
+                    }).growY().width(500f).top().left().padRight(20f);
+
+                    textLabel = c.add(new FLabel("Text")).top().left().grow().get();
+
+                    textLabel.setAlignment(Align.topLeft);
+                }).grow();
+                w.row();
+
+                // Controls
+                w.table(c -> {
+                    c.name = "Controls";
+                    c.bottom().right();
+
+                    c.table(x -> {
+                        skip = x;
+                        x.touchable(() -> Touchable.enabled);
+                        x.center();
+                        x.setBackground(Tex.whiteui);
+                        x.setColor(Pal.darkestGray);
+
+                        x.margin(10f);
+                        x.image(Icon.distribution).size(30f).padRight(10f).touchable(Touchable.disabled).color(Color.white);
+                        x.label(() -> Core.bundle.get("hrd.cutscene.auto")).style(HRStyles.pixel).touchable(Touchable.disabled).color(Color.white).growX();
+
+                        x.hovered(() -> x.setColor(auto ? Pal.gray : Pal.darkestGray));
+                        x.exited(() -> x.setColor(auto ? Pal.darkishGray : Pal.darkestGray));
+                        x.clicked(() -> {
+                            auto = !auto;
+                            setColor(auto ? Pal.darkishGray : Pal.darkestGray);
+                        });
+                    }).size(300f, 50f).bottom().right();
+
+                    c.table().growX();
+
+                    c.table(x -> {
+                        skip = x;
+                        x.touchable(() -> Touchable.enabled);
+                        x.center();
+                        x.setBackground(Tex.whiteui);
+                        x.setColor(Pal.darkishGray);
+
+                        x.margin(10f);
+                        x.label(() -> Core.bundle.get("hrd.cutscene.next")).style(HRStyles.pixel).touchable(Touchable.disabled).color(Color.white).growX();
+                        x.image(Icon.right).size(30f).padLeft(10f).touchable(Touchable.disabled).color(Color.white);
+
+                        x.hovered(() -> x.setColor(Pal.gray));
+                        x.exited(() -> x.setColor(Pal.darkishGray));
+                        x.clicked(this::next);
+                    }).size(300f, 50f).bottom().left();
+                }).growX().height(50f).bottom().left();
             }).bottom().growX().height(300f);
         });
     }
+
+    // SLIDE HANDLING
+    public Dialog show(CutsceneSequence sequence){
+        this.sequence = sequence;
+
+        setSlide(this.sequence.start());
+
+        return show();
+    }
+
+    public void setSlide(CutsceneSlide slide){
+        skippable = true;
+
+        Log.info(slide.id);
+
+        skip.visible(() -> false);
+        skip.touchable(() -> Touchable.disabled);
+        slide.enter(this);
+
+        if(slide.slideDuration != -1){
+            skippable = false;
+            Timer.schedule(this::next, slide.slideDuration); // autoskip for slides with set duration
+        }
+    }
+
+    public void next(){
+        if(autoTask != null){
+            autoTask.cancel();
+            autoTask = null;
+        }
+        if(sequence == null){
+            hide();
+            return;
+        }
+
+        sequence.current.exit(this);
+
+        CutsceneSlide next = sequence.next();
+        if(next == null){
+            hide();
+            return;
+        }
+
+        setSlide(next);
+    }
+
+    // CUTSCENE UTILITIES
 
     public void setCutsceneBackground(Drawable bg){
         background.setBackground(bg);
@@ -110,6 +237,35 @@ public class CutsceneDialog extends BaseDialog{
             proxy.setColor(Color.white);
             CutsceneActor actor = new CutsceneActor(operator, proxy);
             actors.put(operator.name, actor);
+        }
+    }
+
+    public void setSpeaker(String name){
+        nameLabel.setText(() -> name);
+    }
+
+    public void setDialogueSpeech(String text){
+        setDialogueSpeech(text, CutsceneDialog::slideDone);
+    }
+
+    public void setDialogueSpeech(String text, Cons<CutsceneDialog> finishedSpeaking){
+        textLabel.restart(text);
+        textLabel.setTypingListener(new FListener(){
+            @Override
+            public void end(){
+                finishedSpeaking.get(CutsceneDialog.this);
+            }
+        });
+    }
+
+    public void slideDone(){
+        if(sequence.current.slideDuration == -1){
+            skip.visible(() -> true);
+            skip.touchable(() -> Touchable.enabled);
+
+            if(auto && skippable){
+                autoTask = Timer.schedule(this::next, autoWaitTime);
+            }
         }
     }
 }

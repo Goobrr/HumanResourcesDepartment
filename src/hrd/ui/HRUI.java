@@ -19,6 +19,20 @@ public class HRUI{
     public static CutsceneDialog cutsceneDialog = new CutsceneDialog();
 
     public static void load(){
+        CutsceneSequence test = new CutsceneSequence(
+            new CutsceneSlide("test1", "test2", c -> {
+                c.setSpeaker("Minako");
+                c.setDialogueSpeech("This is a test for the HRD cutscene system");
+            }),
+            new CutsceneSlide("test2", "test3", c -> {
+                c.setSpeaker("Minako");
+                c.setDialogueSpeech("I really hope this works");
+            }),
+            new CutsceneSlide("test3", "test4", c -> {
+                c.setSpeaker("Minako");
+                c.setDialogueSpeech("I dont know what else to do");
+            })
+        );
         HRStyles.flat.over = HRStyles.flat.down = HRStyles.flat.up = Tex.whiteui; // woe
         HRStyles.flat.font = Fonts.def;
 
@@ -34,8 +48,9 @@ public class HRUI{
             Reflect.invoke(Vars.ui.menufrag, "buttons", new Object[]{buttons, new MenuButton[]{
                 new MenuButton(Core.bundle.get("play"), Icon.play, () -> {},
                     new MenuButton(Core.bundle.get("campaign"), Icon.play, () -> checkPlay(() -> {
-                        if(true){
-                            cutsceneDialog.show();
+                        if(!Core.settings.getBool("hrd-start-cutscene-played", false)){
+                            cutsceneDialog.show(test);
+                            Core.settings.put("hrd-start-cutscene-played", true);
                         }else{
                             Vars.ui.planet.show();
                         }

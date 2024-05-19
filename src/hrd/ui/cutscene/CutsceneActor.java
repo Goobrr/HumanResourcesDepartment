@@ -23,7 +23,7 @@ public class CutsceneActor{
     public CutsceneActor(Operator operator, Table proxy){
         this.proxy = proxy;
         this.operator = operator;
-        this.region = Core.atlas.find("human-resources-department-" + operator.name + "-portrait-full", "human-resources-department-manager-portrait-full");
+        setRegion("human-resources-department-" + operator.name + "-portrait-full", "human-resources-department-manager-portrait-full");
 
         proxy.setTransform(true);
     };
@@ -35,6 +35,14 @@ public class CutsceneActor{
 
 //        Lines.stroke(1f, Pal.accent);
 //        Lines.rect(x - Scl.scl(width) / 2, y, Scl.scl(width), Scl.scl(height));
+    }
+
+    public void setRegion(String text, String def){
+        setRegion(Core.atlas.find(text, def));
+    }
+
+    public void setRegion(TextureRegion region){
+        this.region = region;
     }
 
     public void highlight(boolean highlighted){

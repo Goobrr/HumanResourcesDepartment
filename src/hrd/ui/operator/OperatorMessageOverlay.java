@@ -38,7 +38,7 @@ public class OperatorMessageOverlay{
             t.table(Styles.black5, w -> {
                 codec = w;
                 w.margin(5f);
-                w.label(() -> lastOperator == null ? "" : " " + Core.bundle.format("hrd.connected", Core.bundle.get("hrd.operator." + lastOperator.name + ".name").toUpperCase())).left().grow();
+                w.label(() -> lastOperator == null ? "" : " " + Core.bundle.format("hrd.codec.connected", Core.bundle.get("hrd.operator." + lastOperator.name + ".name").toUpperCase())).left().grow();
                 w.image(Icon.chat).size(25f).right();
 
                 w.setTransform(true);
