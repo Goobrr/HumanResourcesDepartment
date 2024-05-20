@@ -10,6 +10,8 @@ public class CutsceneSlide{
 
     public float slideDuration = -1;
 
+    public boolean canAuto = true;
+
     public CutsceneSlide(String id, String next, Cons<CutsceneDialog> enter){
         this.id = id;
         this.next = next;
@@ -29,5 +31,9 @@ public class CutsceneSlide{
 
     public void exit(CutsceneDialog d){
         onExit.get(d);
+    }
+
+    public void drawBackground(){
+
     }
 }

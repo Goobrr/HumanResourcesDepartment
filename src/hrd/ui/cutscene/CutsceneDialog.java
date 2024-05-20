@@ -30,7 +30,6 @@ public class CutsceneDialog extends BaseDialog{
 
     public CutsceneSequence sequence;
 
-    public boolean skippable = true;
     public boolean auto = true;
     public float autoWaitTime = 2f;
     public Task autoTask;
@@ -60,6 +59,15 @@ public class CutsceneDialog extends BaseDialog{
         cont.fill(t -> {
             background = t;
             t.name = "Background";
+
+            t.add(new Table(){
+                @Override
+                public void draw(){
+                    if(sequence != null && sequence.current != null){
+                        sequence.current.drawBackground();
+                    }
+                }
+            }).grow();
         });
 
         cont.fill(t -> {
@@ -152,8 +160,6 @@ public class CutsceneDialog extends BaseDialog{
     }
 
     public void setSlide(CutsceneSlide slide){
-        skippable = true;
-
         Log.info(slide.id);
 
         skip.visible(() -> false);
@@ -161,7 +167,6 @@ public class CutsceneDialog extends BaseDialog{
         slide.enter(this);
 
         if(slide.slideDuration != -1){
-            skippable = false;
             Timer.schedule(this::next, slide.slideDuration); // autoskip for slides with set duration
         }
     }
@@ -263,7 +268,7 @@ public class CutsceneDialog extends BaseDialog{
             skip.visible(() -> true);
             skip.touchable(() -> Touchable.enabled);
 
-            if(auto && skippable){
+            if(auto && sequence.current.canAuto){
                 autoTask = Timer.schedule(this::next, autoWaitTime);
             }
         }

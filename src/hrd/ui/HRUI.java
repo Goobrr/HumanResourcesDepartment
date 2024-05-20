@@ -19,6 +19,8 @@ public class HRUI{
     public static CutsceneDialog cutsceneDialog = new CutsceneDialog();
 
     public static void load(){
+        Core.settings.put("hrd-start-cutscene-played", false);
+
         CutsceneSequence test = new CutsceneSequence(
             new CutsceneSlide("test1", "test2", c -> {
                 c.setSpeaker("Minako");
