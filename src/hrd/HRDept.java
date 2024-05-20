@@ -2,6 +2,7 @@ package hrd;
 
 import arc.*;
 import arc.util.*;
+import hrd.graphics.*;
 import hrd.operators.*;
 import hrd.operators.meta.*;
 import hrd.ui.*;
@@ -18,8 +19,11 @@ public class HRDept extends Mod{
 
     public HRDept(){
         Events.on(FileTreeInitEvent.class, e -> {
-            HRFonts.load();
-            HRSounds.load();
+            if(!Vars.headless){
+                HRFonts.load();
+                HRSounds.load();
+                HRModels.load();
+            }
         });
     }
 
