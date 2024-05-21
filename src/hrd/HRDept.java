@@ -2,6 +2,7 @@ package hrd;
 
 import arc.*;
 import arc.util.*;
+import hrd.content.HRPlanets;
 import hrd.graphics.*;
 import hrd.operators.*;
 import hrd.operators.meta.*;
@@ -23,6 +24,10 @@ public class HRDept extends Mod{
                 HRFonts.load();
                 HRSounds.load();
                 HRModels.load();
+
+                Core.app.post(() -> {
+                    HRShaders.load();
+                });
             }
         });
     }
@@ -36,6 +41,8 @@ public class HRDept extends Mod{
         OperatorClass.load();
         Faction.load();
         Operators.load();
+
+        HRPlanets.load();
 
         Operators.minako.assign(SectorPresets.groundZero.sector);
 

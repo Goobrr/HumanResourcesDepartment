@@ -7,6 +7,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 // original impl @GlFolker
+// https://github.com/GlennFolker/Confictura
 public class HRModels{
     public static Scenes3D ship;
 
@@ -19,13 +20,16 @@ public class HRModels{
         assets.setLoader(MeshSet.class, new MeshSetLoader(tree));
         assets.setLoader(Node.class, new NodeLoader(tree));
 
-        ship = new Scenes3D();
+        // parsing and stuff, create the structure stuff
+        Runnable loadSync = (ship = new Scenes3D()).load(tree.get("scenes/ship.gltf"), tree, null);
+        shipCargo = ship.node("Cargo");
+        shipBody = ship.node("Ship");
+        shipThrusters = ship.node("Engines");
 
+
+        // create GL resources in main thread
         app.post(() -> {
-            ship.load(tree.get("scenes/ship.gltf"), tree, null);
-            shipCargo = ship.node("Cargo");
-            shipBody = ship.node("Ship");
-            shipThrusters = ship.node("Engines");
+            loadSync.run();
         });
     }
 }
