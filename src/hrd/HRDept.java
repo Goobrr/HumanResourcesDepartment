@@ -2,6 +2,7 @@ package hrd;
 
 import arc.*;
 import arc.util.*;
+import hrd.audio.HRSoundControl;
 import hrd.content.HRPlanets;
 import hrd.graphics.*;
 import hrd.operators.*;
@@ -49,6 +50,7 @@ public class HRDept extends Mod{
         Events.on(ClientLoadEvent.class, e -> {
             HRStyles.load();
             HRUI.load();
+            HRSoundControl.init();
         });
 
         Events.on(ResetEvent.class, e -> {

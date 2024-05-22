@@ -34,6 +34,8 @@ public class CutsceneDialog extends BaseDialog{
     public float autoWaitTime = 2f;
     public Task autoTask;
 
+    float slideTime;
+
     public float cameraX = 0;
     public CutsceneDialog(){
         super("Cutscene");
@@ -64,7 +66,7 @@ public class CutsceneDialog extends BaseDialog{
                 @Override
                 public void draw(){
                     if(sequence != null && sequence.current != null){
-                        sequence.current.drawBackground();
+                        sequence.current.drawBackground(slideTime);
                     }
                 }
             }).grow();
@@ -148,6 +150,18 @@ public class CutsceneDialog extends BaseDialog{
                 }).growX().height(50f).bottom().left();
             }).bottom().growX().height(300f);
         });
+
+        Events.run(Trigger.update, () -> {
+            if(!isShown()) return;
+
+            slideTime += Time.delta;
+
+            if(sequence != null && sequence.current != null && sequence.current.slideDuration != -1){
+                if(slideTime >= sequence.current.slideDuration * 60){
+                    next();
+                }
+            }
+        });
     }
 
     // SLIDE HANDLING
@@ -166,9 +180,7 @@ public class CutsceneDialog extends BaseDialog{
         skip.touchable(() -> Touchable.disabled);
         slide.enter(this);
 
-        if(slide.slideDuration != -1){
-            Timer.schedule(this::next, slide.slideDuration); // autoskip for slides with set duration
-        }
+        slideTime = 0;
     }
 
     public void next(){

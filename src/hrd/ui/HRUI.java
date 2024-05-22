@@ -4,6 +4,7 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import hrd.content.cutscenes.StartCutscene;
 import hrd.ui.cutscene.*;
 import hrd.ui.menu.*;
 import hrd.ui.operator.*;
@@ -19,22 +20,10 @@ public class HRUI{
     public static CutsceneDialog cutsceneDialog = new CutsceneDialog();
 
     public static void load(){
-        //Core.settings.put("hrd-start-cutscene-played", false);
+        Core.settings.put("hrd-start-cutscene-played", false);
 
-        CutsceneSequence test = new CutsceneSequence(
-            new CutsceneSlide("test1", "test2", c -> {
-                c.setSpeaker("Minako");
-                c.setDialogueSpeech("This is a test for the HRD cutscene system");
-            }),
-            new CutsceneSlide("test2", "test3", c -> {
-                c.setSpeaker("Minako");
-                c.setDialogueSpeech("I really hope this works");
-            }),
-            new CutsceneSlide("test3", "test4", c -> {
-                c.setSpeaker("Minako");
-                c.setDialogueSpeech("I dont know what else to do");
-            })
-        );
+        CutsceneSequence test = new StartCutscene();
+
         HRStyles.flat.over = HRStyles.flat.down = HRStyles.flat.up = Tex.whiteui; // woe
         HRStyles.flat.font = Fonts.def;
 

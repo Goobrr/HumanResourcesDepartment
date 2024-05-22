@@ -1,6 +1,7 @@
 package hrd.ui.cutscene;
 
 import arc.func.*;
+import arc.util.Log;
 
 public class CutsceneSlide{
     public String id;
@@ -11,6 +12,13 @@ public class CutsceneSlide{
     public float slideDuration = -1;
 
     public boolean canAuto = true;
+
+    public CutsceneSlide(String id, String next){
+        this.id = id;
+        this.next = next;
+        this.onEnter = d -> {};
+        this.onExit = d -> {};
+    }
 
     public CutsceneSlide(String id, String next, Cons<CutsceneDialog> enter){
         this.id = id;
@@ -33,7 +41,7 @@ public class CutsceneSlide{
         onExit.get(d);
     }
 
-    public void drawBackground(){
-
+    public void drawBackground(float time){
+        Log.info(time);
     }
 }
