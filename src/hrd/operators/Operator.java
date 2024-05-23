@@ -2,14 +2,19 @@ package hrd.operators;
 
 import arc.*;
 import arc.math.Mathf;
+import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Log;
 import hrd.operators.dialog.*;
 import hrd.operators.dialog.dialogs.*;
+import hrd.operators.item.OperatorItem;
 import hrd.operators.meta.*;
+import hrd.operators.item.Modifier;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
+
+import java.util.Comparator;
 
 public class Operator{
     public String name;
@@ -36,6 +41,10 @@ public class Operator{
 
     public DialogProvider dialog;
 
+    public ObjectMap<String, Seq<Modifier>> modifiers = new ObjectMap<>();
+
+    public Seq<OperatorItem> items = new Seq<>(6);
+
     public int level = 1;
     protected float experience = 0;
 
@@ -49,6 +58,7 @@ public class Operator{
     public int sectorid = -1;
     public Planet planet;
     public int id;
+
 
     private static int nextid = 0;
 
@@ -68,6 +78,38 @@ public class Operator{
 
     public void update(){
 
+    }
+
+    public void rebuildModifiers(){
+        modifiers.clear();
+
+        for(OperatorItem item : items){
+            for(Modifier modifier : item.modifiers){
+                Seq<Modifier> attribute = modifiers.get(modifier.attribute);
+                if(attribute == null){
+                    attribute = new Seq<>();
+                }
+                attribute.add(modifier);
+            }
+        }
+
+        for(Seq<Modifier> attribute : modifiers.values()){
+            attribute.sort(Comparator.comparingInt(a -> a.step));
+        }
+    }
+
+    public OperatorItem getItem(int slot){
+        return items.get(slot);
+    }
+
+    public void setItem(int slot, OperatorItem item){
+        items.set(slot, item);
+        rebuildModifiers();
+    }
+
+    public void removeItem(int slot){
+        items.remove(slot);
+        rebuildModifiers();
     }
 
     public void addXP(float xp){
