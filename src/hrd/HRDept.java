@@ -3,8 +3,7 @@ package hrd;
 import arc.*;
 import arc.util.*;
 import hrd.audio.HRSoundControl;
-import hrd.content.HRPlanets;
-import hrd.graphics.*;
+import hrd.audio.HRSounds;
 import hrd.operators.*;
 import hrd.operators.meta.*;
 import hrd.ui.*;
@@ -24,11 +23,11 @@ public class HRDept extends Mod{
             if(!Vars.headless){
                 HRFonts.load();
                 HRSounds.load();
-                HRModels.load();
-
-                Core.app.post(() -> {
-                    HRShaders.load();
-                });
+//                HRModels.load();
+//
+//                Core.app.post(() -> {
+//                    HRShaders.load();
+//                });
             }
         });
     }
@@ -43,7 +42,7 @@ public class HRDept extends Mod{
         Faction.load();
         Operators.load();
 
-        HRPlanets.load();
+        // HRPlanets.load();
 
         Operators.minako.assign(SectorPresets.groundZero.sector);
 
