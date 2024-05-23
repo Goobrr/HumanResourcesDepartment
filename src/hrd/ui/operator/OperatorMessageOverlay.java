@@ -11,6 +11,7 @@ import arc.scene.actions.Actions;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import hrd.*;
+import hrd.audio.HRSounds;
 import hrd.operators.*;
 import mindustry.Vars;
 import mindustry.game.EventType;

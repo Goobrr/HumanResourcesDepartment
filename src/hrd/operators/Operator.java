@@ -93,10 +93,18 @@ public class Operator{
             }
         }
 
+        // sort modifier steps
         for(Seq<Modifier> attribute : modifiers.values()){
             attribute.sort(Comparator.comparingInt(a -> a.step));
         }
     }
+
+    public float applyModifiers(String attribute, float v){
+        for(Modifier modifier : modifiers.get(attribute).toArray()){
+            v = modifier.get(v);
+        }
+        return v;
+    };
 
     public OperatorItem getItem(int slot){
         return items.get(slot);
