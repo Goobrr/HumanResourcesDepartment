@@ -9,6 +9,7 @@ import mindustry.gen.*;
 
 public class Operators{
     public static IntMap<Operator> all = new IntMap<>();
+    public static ObjectMap<String, Operator> names = new ObjectMap<>();
 
     public static Operator minako, rhyo;
 
@@ -51,5 +52,9 @@ public class Operators{
 
     public static Operator getByID(int id){
         return all.get(id);
+    }
+
+    public static Operator getByName(String name){
+        return names.get(name);
     }
 }

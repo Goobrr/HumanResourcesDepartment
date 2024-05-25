@@ -16,9 +16,6 @@ public class HRSoundControl extends SoundControl {
         control.sound = new HRSoundControl();
     }
 
-    public void doSilence(){
-        silence();
-    }
     @Override
     public void update() {
         boolean paused = state.isGame() && Core.scene.hasDialog();
@@ -32,7 +29,7 @@ public class HRSoundControl extends SoundControl {
 
         //fade the lowpass filter in/out, poll every 30 ticks just in case performance is an issue
         if(timer.get(1, 30f)){
-            Core.audio.soundBus.fadeFilterParam(0, Filters.paramWet, paused ? 1f : 0f, 0.4f);
+            Core.audio.soundBus.fadeFilterParam(0, Filters.paramWet, paused && !HRUI.cutsceneDialog.isShown() ? 1f : 0f, 0.4f);
         }
 
         //play/stop ordinary effects
@@ -52,7 +49,7 @@ public class HRSoundControl extends SoundControl {
             }
         }
 
-        Core.audio.setPaused(Core.audio.soundBus.id, state.isPaused());
+        Core.audio.setPaused(Core.audio.soundBus.id, state.isPaused() && !HRUI.cutsceneDialog.isShown());
 
         // skip automatic playing behavior when cutscene UI is shown
         if(HRUI.cutsceneDialog.isShown()){

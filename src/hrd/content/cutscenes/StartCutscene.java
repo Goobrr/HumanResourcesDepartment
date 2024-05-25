@@ -1,101 +1,136 @@
 package hrd.content.cutscenes;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
-import arc.math.Interp;
+import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.math.geom.Vec3;
-import arc.util.Log;
-import arc.util.Time;
+import arc.util.Align;
 import arc.util.Timer;
 import arc.util.Tmp;
-import hrd.audio.*;
+import hrd.HREvents;
+import hrd.content.cutscenes.slides.*;
 import hrd.graphics.HRDrawf;
+import hrd.operators.Operators;
 import hrd.ui.HRFonts;
 import hrd.ui.cutscene.*;
-import mindustry.Vars;
-import mindustry.content.Planets;
-import mindustry.gen.Icon;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Pal;
-import mindustry.graphics.g3d.PlanetParams;
-import mindustry.ui.Fonts;
+import mindustry.*;
 
 public class StartCutscene extends CutsceneSequence {
 
-    public StartCutscene(){
+    public StartCutscene() {
         super(
-                new CutsceneSlide("st-1", "st-2"){{
-                    slideDuration = 8;
-                    canAuto = false;
-                }
+                new BriefingStartSlide("st-1", "st-2") {
+                    {
+                        slideDuration = 11;
+                    }
+
                     @Override
                     public void enter(CutsceneDialog d) {
-                        d.showOverlay(false);
+                        super.enter(d);
+                        Vars.ui.hudfrag.shown = false;
+                        Vars.ui.consolefrag.hide();
 
-                        Timer.schedule(() -> Core.app.post(() -> {
-                            HRSounds.briefingStart.play();
-                        }), 90 / 60f);
+                        d.showBackground(false);
+                        d.lockInput(true);
+                    }
+
+                    @Override
+                    public void drawContents(float time) {
+                        Draw.color(Color.black, 1f - 0.25f * Mathf.curve(time, 60f * 7f, 60f * 9f));
+                        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
+
+                        HRDrawf.text(100, Core.graphics.getHeight() - 100, Color.white, "SHARDED CORPS OS(R)", HRFonts.pixel);
+                        HRDrawf.text(100, Core.graphics.getHeight() - 140, Color.white, "AUTHORIZED AS: BFR-1", HRFonts.pixel);
+
+                        Tmp.c1.set(Color.white).a(1 - Mathf.curve(time, 60f * 9f, 60f * 11f));
+
+                        float w1 = 0;
+                        if (time > 60f * 6f)
+                            HRDrawf.text(100, Core.graphics.getHeight() - 220, Tmp.c1, "DONE - LANDING SEQUENCE", HRFonts.pixel);
+                        if (time > 60f * 6.5f)
+                            HRDrawf.text(100, Core.graphics.getHeight() - 260, Tmp.c1, "DONE - PERSONNEL INIT", HRFonts.pixel);
+                        if (time > 60f * 8f)
+                            w1 = HRDrawf.text(100, Core.graphics.getHeight() - 300, Tmp.c1, "PERSONNEL ONBOARD: ", HRFonts.pixel);
+                        if (time > 60f * 9.1f)
+                            HRDrawf.text(100 + w1 + 40, Core.graphics.getHeight() - 300, Tmp.c1, "MNK2871 - OP. MINAKO", HRFonts.pixel);
+                        if (time > 60f * 9.2f)
+                            HRDrawf.text(100 + w1 + 40, Core.graphics.getHeight() - 340, Tmp.c1, "0000000 - MNGR.", HRFonts.pixel);
+                        Draw.color();
+                    }
+                },
+                new CutsceneSlide("st-2", "st-3"){
+                    @Override
+                    public void enter(CutsceneDialog d) {
+                        super.enter(d);
+
+                        d.setSpeaker("???");
+                        d.setDialogueSpeech("Oh! You're finally awake. I've been waiting for a while.");
+
+                        d.textLabel.pause();
+                        Timer.schedule(() -> {
+                            d.showOverlay(true);
+                            d.textLabel.resume();
+                        }, 1f);
                     }
 
                     @Override
                     public void drawBackground(float time) {
-                        float f2 = Mathf.curve(time, 120, 130);
-                        float f3 = Mathf.curve(time, 110, 130);
-                        float f4 = Mathf.curve(time, 110, 175);
-
-                        float f5 = Mathf.curve(time, 150, 180);
-                        float f6 = Mathf.curve(time, 150, 260);
-                        float f7 = Mathf.curve(time, 280, 300);
-
-                        float f2i = Mathf.curve(time, 190, 220);
-                        float f3i = Mathf.curve(time, 330, 345);
-
-
-                        Draw.color(Tmp.c1.set(Color.black).lerp(Pal.darkestGray, 0.5f * f3), 1f - (f3i * 0.8f));
+                        Draw.color(Color.black, 0.75f);
                         Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
+                    }
+                },
+                new CutsceneSlide("st-3", "st-4"){
+                    @Override
+                    public void enter(CutsceneDialog d) {
+                        super.enter(d);
 
-                        if(time > 110) {
-                            float xo = 240f - (90f * Interp.pow3Out.apply(f4));
-                            Lines.stroke(2f - (2f * f3i), Pal.darkestGray);
-                            for (float i = 0; i < Core.graphics.getWidth() + xo; i += xo) {
-                                Lines.line(i - (time / 2f % xo), 0, i - (time / 2f % xo), Core.graphics.getHeight());
-                            }
+                        d.setDialogueSpeech("We've been on cruise for quite some time, so i figured you get some rest while i prep your equipment.");
+                    }
+                    @Override
+                    public void drawBackground(float time) {
+                        Draw.color(Color.black, 0.75f);
+                        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
+                    }
+                },
+                new CutsceneSlide("st-4", "st-5"){
+                    @Override
+                    public void enter(CutsceneDialog d) {
+                        super.enter(d);
 
-                            for (float i = 0; i < Core.graphics.getHeight(); i += 240f - (90f * Interp.pow3Out.apply(f4))) {
-                                Lines.line(0, i, Core.graphics.getWidth(), i);
-                            }
-                        }
+                        d.setSpeaker("???");
+                        d.setDialogueSpeech("Speaking of, your coreship should be ready to launch by now.");
+                    }
+                    @Override
+                    public void drawBackground(float time) {
+                        Draw.color(Color.black, 0.75f);
+                        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
+                    }
+                },
+                new CutsceneSlide("st-5", "st-6"){
+                    @Override
+                    public void enter(CutsceneDialog d) {
+                        super.enter(d);
 
-                        Draw.color(Tmp.c1.set(Pal.darkerGray).lerp(Color.black, 0.5f * Interp.pow3Out.apply(f5)), Interp.pow3Out.apply(f2 - f2i));
-                        Draw.rect("human-resources-department-seventh-branch", Core.graphics.getWidth() / 2f, (Core.graphics.getHeight() / 2f) + 125, 500 * Interp.pow3Out.apply(f2), 500);
-                        Draw.color();
+                        d.showOverlay(false);
+                        canAuto = false;
+                        slideDuration = 10;
 
-                        HRDrawf.text(70, 75, Tmp.c1.set(Pal.gray).a(f3 -f3i), "T " + Time.nanos(), HRFonts.pixel);
-
-                        Lines.stroke(time > 110 && time < 346 ? 5 : 0, Tmp.c1.set(Pal.darkestGray).lerp(Pal.gray, f3 - f3i));
-
-                        Lines.rect(50f, 50f, Core.graphics.getWidth() - 100f, Mathf.lerp(50f,Core.graphics.getHeight() - 100f, Interp.pow3Out.apply(f3)) * Interp.pow3Out.apply(1 - f3i));
-
-                        Draw.color(Pal.darkerGray);
-                        Fill.rect(Core.graphics.getWidth() / 2f - (250 * (1 - Interp.pow3Out.apply(f5))), Core.graphics.getHeight() / 2f, 500 * Interp.pow3Out.apply(f5), 30 * Interp.pow3Out.apply(1 - f3i));
-
-                        Draw.color(time < 280 || (time > 283 && time < 286) || time > 289 ? Tmp.c1.set(Color.white).lerp(Pal.accent, f7) : Tmp.c1.set(Color.white).a(0));
-                        Fill.rect(Core.graphics.getWidth() / 2f - (250 * (1 - f6)), Core.graphics.getHeight() / 2f, 500 * Interp.pow3Out.apply(f5) * f6 , 30 * Interp.pow3Out.apply(1 - f3i));
-
-                        if(time < 260 || (time > 263 && time < 266) || time > 269){
-                            HRDrawf.text(Core.graphics.getWidth() / 2f - 250 + ((500 - 53) * Interp.pow3Out.apply(f7)), Core.graphics.getHeight() / 2f + 40, Tmp.c1.set(Color.white).a(f5 - f3i), " BRF-1", HRFonts.pixel);
-                            HRDrawf.text(Core.graphics.getWidth() / 2f - 250, Core.graphics.getHeight() / 2f + (40f * Interp.pow3Out.apply(f7)), Tmp.c1.set(Pal.darkerGray).lerp(Color.white, Interp.pow3Out.apply(f7)).a(f5 - f3i), time > 260 ? " // AUTHORIZED" : " // ACCESSING", HRFonts.pixel);
-                        }
-
-                        Draw.color(Tmp.c1.set(Pal.darkestGray).a(f7 > 0 ? 1 - f3i : 0));
-                        Draw.rect(Icon.lockOpen.getRegion(), Core.graphics.getWidth() / 2f - 220 + (450 * Interp.pow3Out.apply(f7)), Core.graphics.getHeight() / 2f, 20f, 20f);
+                        Timer.schedule(() -> {
+                            Vars.control.resume();
+                        }, 1.5f);
+                    }
+                    @Override
+                    public void drawBackground(float time) {
+                        Draw.color(Color.black, 0.75f - 0.75f * Mathf.curve(time, 0, 90));
+                        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
                     }
                 }
         );
+    }
+
+    public static void message(String message){
+        Events.fire(new HREvents.DialogMessage(Operators.minako, Core.atlas.find("human-resources-department-minako-portrait-bust"), message, 10f));
     }
 
     @Override

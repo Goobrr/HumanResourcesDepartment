@@ -67,6 +67,7 @@ public class Operator{
         this.dialog = new DefaultDialogProvider();
 
         Operators.all.put(nextid, this);
+        Operators.names.put(name, this);
 
         id = nextid;
         nextid++;

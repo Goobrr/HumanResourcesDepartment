@@ -12,6 +12,10 @@ public class HRDrawf {
     public static float text(float x, float y, Color color, CharSequence text, Font font){
         return text(x, y, false, -1, color, text, font, 1f, Align.left);
     }
+
+    public static float text(float x, float y, Color color, CharSequence text, Font font, int align){
+        return text(x, y, false, -1, color, text, font, 1f, align);
+    }
     public static float text(float x, float y, boolean underline, float maxWidth, Color color, CharSequence text, Font font, float scl, int align){
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();

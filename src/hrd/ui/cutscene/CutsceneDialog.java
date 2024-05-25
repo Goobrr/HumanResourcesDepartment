@@ -14,8 +14,10 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Timer.*;
+import hrd.audio.HRSounds;
 import hrd.operators.*;
 import hrd.ui.*;
+import mindustry.Vars;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -31,7 +33,7 @@ public class CutsceneDialog extends BaseDialog{
     public CutsceneSequence sequence;
 
     public boolean auto = true;
-    public float autoWaitTime = 2f;
+    public float autoWaitTime = 5f;
     public Task autoTask;
 
     float slideTime;
@@ -40,7 +42,8 @@ public class CutsceneDialog extends BaseDialog{
     public CutsceneDialog(){
         super("Cutscene");
         titleTable.clear();
-        setBackground(Styles.black8);
+        setStyle(new DialogStyle());
+        setBackground(Styles.black);
 
         cutsceneStage = new Table(){
             @Override
@@ -206,8 +209,8 @@ public class CutsceneDialog extends BaseDialog{
 
     // CUTSCENE UTILITIES
 
-    public void setCutsceneBackground(Drawable bg){
-        background.setBackground(bg);
+    public void lockInput(boolean b){
+        HRUI.inputLock = b;
     }
 
     public void setOverlayBackground(Drawable bg){
@@ -215,8 +218,7 @@ public class CutsceneDialog extends BaseDialog{
     }
 
     public void showBackground(boolean shown){
-        background.visible(() -> shown);
-        setBackground(shown ? Styles.black8 : Styles.none);
+        setBackground(shown ? Styles.black : Styles.none);
     }
 
     public void showStage(boolean shown){
@@ -271,6 +273,13 @@ public class CutsceneDialog extends BaseDialog{
             @Override
             public void end(){
                 finishedSpeaking.get(CutsceneDialog.this);
+            }
+
+            @Override
+            public void onChar(char ch) {
+                FListener.super.onChar(ch);
+
+                Core.app.post(() -> HRSounds.type.play());
             }
         });
     }

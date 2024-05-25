@@ -9,6 +9,7 @@ import hrd.ui.cutscene.*;
 import hrd.ui.menu.*;
 import hrd.ui.operator.*;
 import mindustry.*;
+import mindustry.content.SectorPresets;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
@@ -19,13 +20,17 @@ public class HRUI{
     public static OperatorsDialog operators = new OperatorsDialog();
     public static CutsceneDialog cutsceneDialog = new CutsceneDialog();
 
+    public static boolean inputLock;
+
     public static void load(){
-        Core.settings.put("hrd-start-cutscene-played", false);
+        Core.settings.put("hrd-start-tutorial-played", false);
 
         CutsceneSequence test = new StartCutscene();
 
         HRStyles.flat.over = HRStyles.flat.down = HRStyles.flat.up = Tex.whiteui; // woe
         HRStyles.flat.font = Fonts.def;
+
+        Vars.control.input.addLock(() -> inputLock);
 
         // Operators Button
         Events.on(ResizeEvent.class, e -> {
@@ -39,9 +44,16 @@ public class HRUI{
             Reflect.invoke(Vars.ui.menufrag, "buttons", new Object[]{buttons, new MenuButton[]{
                 new MenuButton(Core.bundle.get("play"), Icon.play, () -> {},
                     new MenuButton(Core.bundle.get("campaign"), Icon.play, () -> checkPlay(() -> {
-                        if(!Core.settings.getBool("hrd-start-cutscene-played", false)){
+                        if(!Core.settings.getBool("hrd-start-tutorial-played", false)){
+                            // Starting Tutorial
+                            SectorPresets.groundZero.sector.save.delete();
+                            SectorPresets.groundZero.sector.save = null;
+                            SectorPresets.groundZero.sector.clearInfo();
+                            Vars.control.playSector(SectorPresets.groundZero.sector);
+                            Vars.control.pause();
+
                             cutsceneDialog.show(test);
-                            Core.settings.put("hrd-start-cutscene-played", true);
+                            Core.settings.put("hrd-start-tutorial-played", true);
                         }else{
                             Vars.ui.planet.show();
                         }

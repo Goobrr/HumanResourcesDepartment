@@ -4,6 +4,7 @@ import arc.*;
 import arc.util.*;
 import hrd.audio.HRSoundControl;
 import hrd.audio.HRSounds;
+import hrd.content.logic.HRLStatements;
 import hrd.operators.*;
 import hrd.operators.meta.*;
 import hrd.ui.*;
@@ -34,17 +35,13 @@ public class HRDept extends Mod{
 
     @Override
     public void loadContent(){
-        // testing
-        Core.settings.put("hrd-minako-experience", 200f);
-
         EntityRegistry.register();
         OperatorClass.load();
         Faction.load();
         Operators.load();
+        HRLStatements.load();
 
         // HRPlanets.load();
-
-        Operators.minako.assign(SectorPresets.groundZero.sector);
 
         Events.on(ClientLoadEvent.class, e -> {
             HRStyles.load();
