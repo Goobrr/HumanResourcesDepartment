@@ -71,7 +71,7 @@ public class OperatorMessageOverlay{
         Table message = messagePile.table(t -> {
             t.bottom().left();
             t.table(Core.atlas.drawable("human-resources-department-portrait-background"),w -> {
-                w.image(() -> portrait == null ? Icon.none.getRegion() : portrait).size(30 * 3 + 15, 42 * 3 + 15);
+                w.image(() -> portrait == null ? Core.atlas.find("human-resources-department-deafault-portrait") : portrait).size(30 * 3 + 15, 42 * 3 + 15);
             }).bottom().left().size(30 * 3 + 15, 42 * 3 + 15).name("Portrait");
 
             t.table(Styles.black5, w -> {
@@ -86,7 +86,7 @@ public class OperatorMessageOverlay{
                     @Override
                     public void onChar(char ch) {
                         FListener.super.onChar(ch);
-                        Core.app.post(() -> HRSounds.type.play());
+                        Core.app.post(() -> HRSounds.type.play(1f));
                     }
                 });
 
@@ -101,7 +101,7 @@ public class OperatorMessageOverlay{
 
         if(!codecShown) {
             codec.actions(Actions.fadeIn(0.5f, Interp.pow3Out));
-            Core.app.post(() -> HRSounds.codecOpen.play());
+            Core.app.post(() -> HRSounds.codecOpen.play(1f));
             codecShown = true;
         }
 

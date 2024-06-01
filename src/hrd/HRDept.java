@@ -4,12 +4,13 @@ import arc.*;
 import arc.util.*;
 import hrd.audio.HRSoundControl;
 import hrd.audio.HRSounds;
+import hrd.content.HRMaps;
 import hrd.content.logic.HRLStatements;
+import hrd.game.script.ScriptObjectives;
 import hrd.operators.*;
 import hrd.operators.meta.*;
 import hrd.ui.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import hrd.gen.*;
@@ -40,6 +41,8 @@ public class HRDept extends Mod{
         Faction.load();
         Operators.load();
         HRLStatements.load();
+        HRMaps.load();
+        ScriptObjectives.load();
 
         // HRPlanets.load();
 

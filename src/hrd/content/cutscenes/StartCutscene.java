@@ -5,11 +5,12 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.util.Align;
+import arc.util.Log;
 import arc.util.Timer;
 import arc.util.Tmp;
 import hrd.HREvents;
 import hrd.content.cutscenes.slides.*;
+import hrd.game.script.GameScripts;
 import hrd.graphics.HRDrawf;
 import hrd.operators.Operators;
 import hrd.ui.HRFonts;
@@ -37,13 +38,14 @@ public class StartCutscene extends CutsceneSequence {
 
                     @Override
                     public void drawContents(float time) {
+                        Log.info(time);
                         Draw.color(Color.black, 1f - 0.25f * Mathf.curve(time, 60f * 7f, 60f * 9f));
                         Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
 
-                        HRDrawf.text(100, Core.graphics.getHeight() - 100, Color.white, "SHARDED CORPS OS(R)", HRFonts.pixel);
-                        HRDrawf.text(100, Core.graphics.getHeight() - 140, Color.white, "AUTHORIZED AS: BFR-1", HRFonts.pixel);
-
                         Tmp.c1.set(Color.white).a(1 - Mathf.curve(time, 60f * 9f, 60f * 11f));
+
+                        HRDrawf.text(100, Core.graphics.getHeight() - 100, Tmp.c1, "SHARDED CORPS OS(R)", HRFonts.pixel);
+                        HRDrawf.text(100, Core.graphics.getHeight() - 140, Tmp.c1, "AUTHORIZED AS: BFR-1", HRFonts.pixel);
 
                         float w1 = 0;
                         if (time > 60f * 6f)
@@ -59,65 +61,20 @@ public class StartCutscene extends CutsceneSequence {
                         Draw.color();
                     }
                 },
-                new CutsceneSlide("st-2", "st-3"){
-                    @Override
-                    public void enter(CutsceneDialog d) {
-                        super.enter(d);
-
-                        d.setSpeaker("???");
-                        d.setDialogueSpeech("Oh! You're finally awake. I've been waiting for a while.");
-
-                        d.textLabel.pause();
-                        Timer.schedule(() -> {
-                            d.showOverlay(true);
-                            d.textLabel.resume();
-                        }, 1f);
-                    }
-
-                    @Override
-                    public void drawBackground(float time) {
-                        Draw.color(Color.black, 0.75f);
-                        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
-                    }
-                },
-                new CutsceneSlide("st-3", "st-4"){
-                    @Override
-                    public void enter(CutsceneDialog d) {
-                        super.enter(d);
-
-                        d.setDialogueSpeech("We've been on cruise for quite some time, so i figured you get some rest while i prep your equipment.");
-                    }
-                    @Override
-                    public void drawBackground(float time) {
-                        Draw.color(Color.black, 0.75f);
-                        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
-                    }
-                },
-                new CutsceneSlide("st-4", "st-5"){
-                    @Override
-                    public void enter(CutsceneDialog d) {
-                        super.enter(d);
-
-                        d.setSpeaker("???");
-                        d.setDialogueSpeech("Speaking of, your coreship should be ready to launch by now.");
-                    }
-                    @Override
-                    public void drawBackground(float time) {
-                        Draw.color(Color.black, 0.75f);
-                        Fill.rect(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Core.graphics.getWidth(), Core.graphics.getHeight());
-                    }
-                },
-                new CutsceneSlide("st-5", "st-6"){
+                new CutsceneSlide("st-2", ""){{
+                    canAuto = false;
+                    slideDuration = 1.5f;
+                }
                     @Override
                     public void enter(CutsceneDialog d) {
                         super.enter(d);
 
                         d.showOverlay(false);
-                        canAuto = false;
-                        slideDuration = 10;
 
                         Timer.schedule(() -> {
+                            Log.info("Starting");
                             Vars.control.resume();
+                            GameScripts.tutorial.start();
                         }, 1.5f);
                     }
                     @Override
