@@ -4,12 +4,16 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import hrd.content.HRMaps;
 import hrd.content.cutscenes.StartCutscene;
+import hrd.game.script.GameScript;
+import hrd.game.script.GameScripts;
 import hrd.ui.cutscene.*;
+import hrd.ui.debug.DebugOverlay;
 import hrd.ui.menu.*;
 import hrd.ui.operator.*;
+import hrd.ui.script.ScriptObjectiveOverlay;
 import mindustry.*;
-import mindustry.content.SectorPresets;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
@@ -22,10 +26,13 @@ public class HRUI{
 
     public static boolean inputLock;
 
+    public static GameScript activeGameScript;
+
     public static void load(){
         Core.settings.put("hrd-start-tutorial-played", false);
 
         CutsceneSequence test = new StartCutscene();
+        GameScripts.init();
 
         HRStyles.flat.over = HRStyles.flat.down = HRStyles.flat.up = Tex.whiteui; // woe
         HRStyles.flat.font = Fonts.def;
@@ -35,7 +42,7 @@ public class HRUI{
         // Operators Button
         Events.on(ResizeEvent.class, e -> {
             // Insert our button into the database submenu with reflection magic
-            // By *replacing ALL of the menu buttons*
+            // By *replacing ALL the menu buttons*
             // May break itself or other mods if another overrides it
             Table buttons = (Table) ((Table) Reflect.get(Vars.ui.menufrag, "container")).getChildren().get(0);
 
@@ -46,10 +53,7 @@ public class HRUI{
                     new MenuButton(Core.bundle.get("campaign"), Icon.play, () -> checkPlay(() -> {
                         if(!Core.settings.getBool("hrd-start-tutorial-played", false)){
                             // Starting Tutorial
-                            SectorPresets.groundZero.sector.save.delete();
-                            SectorPresets.groundZero.sector.save = null;
-                            SectorPresets.groundZero.sector.clearInfo();
-                            Vars.control.playSector(SectorPresets.groundZero.sector);
+                            Vars.control.playMap(HRMaps.tutorial, HRMaps.tutorial.rules());
                             Vars.control.pause();
 
                             cutsceneDialog.show(test);
@@ -84,6 +88,13 @@ public class HRUI{
 
         // Dialog overlay
         OperatorMessageOverlay.build(Vars.ui.hudGroup);
+
+        // Script Objectives
+        ScriptObjectiveOverlay.build(Vars.ui.hudGroup);
+
+        // Debug
+        DebugOverlay.build(Vars.ui.hudGroup);
+
     }
     private static void checkPlay(Runnable run){
         if(!Vars.mods.hasContentErrors()){

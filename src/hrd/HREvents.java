@@ -1,5 +1,6 @@
 package hrd;
 
+import arc.Core;
 import arc.graphics.g2d.*;
 import hrd.operators.*;
 
@@ -15,7 +16,7 @@ public class HREvents{
         public DialogMessage(Operator sender, String text){
             this.sender = sender;
             this.text = text;
-            this.portrait = null;
+            this.portrait = Core.atlas.find("human-resources-department-" + sender.name + "-portrait-bust");
             this.callback = () -> {};
             this.lifetime = 10f;
         }
@@ -23,7 +24,7 @@ public class HREvents{
         public DialogMessage(Operator sender, String text, float lifetime){
             this.sender = sender;
             this.text = text;
-            this.portrait = null;
+            this.portrait = Core.atlas.find("human-resources-department-" + sender.name + "-portrait-bust");
             this.callback = () -> {};
             this.lifetime = lifetime;
         }
